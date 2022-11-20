@@ -1,0 +1,3 @@
+pub enum RecordTypes {
+   A,
+}
