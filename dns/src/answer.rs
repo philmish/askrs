@@ -1,11 +1,32 @@
-use utility::Row;
+use utility::{Row, Blob};
 
-use crate::name::Name;
+use crate::{name::Name, record::RecordType};
+
+
+trait ParsableRecord {
+    fn read_r_data(data: Vec<u8>, offset: Option<u8>) -> Self;
+    fn print_r_data(&self);
+}
+
+struct RecordData<T: ParsableRecord> {
+    content: T,
+}
+
+impl ParsableRecord for Name {
+    fn print_r_data(&self) {
+        println!("Name: {}", self.get_string().unwrap_or("is unparseable".to_string()));
+    }
+
+    fn read_r_data(data: Vec<u8>, offset: Option<u8>) -> Self {
+        let bytes = data.get_from_offset(offset.unwrap_or(0)).unwrap();
+        return Name::from_bytes(bytes);
+    }
+}
 
 //TODO Find a better way to parse answer data for Address or CNAME
 pub struct Answer {
     name: Name,
-    r_type: [u8;2],
+    r_type: RecordType,
     class: [u8;2],
     ttl: [u8;4],
     length: [u8;2],
@@ -23,7 +44,7 @@ impl Answer {
     
     pub fn print(&self) {
         println!("Name: {}", self.name.get_string().unwrap());
-        println!("Type: {}", self.r_type.as_u16());
+        println!("Type: {}", self.r_type.to_string());
         println!("Class: {}", self.class.as_u16());
         println!("TTL: {}", self.ttl_as_u32());
         println!("Length: {}", self.length.as_u16());

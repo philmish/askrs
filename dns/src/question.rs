@@ -1,6 +1,6 @@
 use utility::{Row, Blob};
 
-use crate::{name, RecordType};
+use crate::{name, record::RecordType};
 
 pub enum QClass {
     INET,
@@ -35,6 +35,14 @@ pub struct Question {
 }
 
 impl Question {
+    pub fn new(name: String, q_type: Option<RecordType>, q_class: Option<QClass>) -> Self {
+        return Question{
+            q_name: name::Name::from_string(name).unwrap(),
+            q_type: q_type.unwrap_or(RecordType::A),
+            q_class: q_class.unwrap_or(QClass::INET),
+        };
+    }
+
     pub fn from_bytes(data: Vec<u8>) -> Result<Self, &'static str> {
        let mut name = name::Name::from_bytes(data.to_vec()) ;
        if name.is_compressed() {

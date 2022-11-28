@@ -5,6 +5,11 @@ version = 3
 [[package]]
 name = "cli"
 version = "0.1.0"
+dependencies = [
+ "dns",
+ "parsing",
+ "utility",
+]
 
 [[package]]
 name = "dns"
@@ -16,6 +21,9 @@ dependencies = [
 [[package]]
 name = "parsing"
 version = "0.1.0"
+dependencies = [
+ "dns",
+]
 
 [[package]]
 name = "utility"

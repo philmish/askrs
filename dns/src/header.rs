@@ -9,6 +9,10 @@ impl Flags {
     pub fn new() -> Self {
         return Flags{bytes: [0,0]};
     }
+    
+    pub fn data(&self) -> [u8;2] {
+        return  self.bytes;
+    }
 
     pub fn set_recursive(&mut self) {
         self.bytes.start_set_bits(0b0000_0001);
@@ -38,6 +42,21 @@ pub struct Header {
 
 impl Header {
 
+    pub fn new_query(rd: Option<bool>, inv: Option<bool>) -> Self {
+        let mut flags = Flags::new();
+        flags.set_to_query();
+        if rd.unwrap_or(false) {flags.set_recursive()};
+        if inv.unwrap_or(false) {flags.set_standard_inverse()};
+        return Self{
+            id: [192, 175],
+            flags: flags.data(),
+            q_count: [0,1],
+            an_count: [0, 0],
+            ns_count: [0, 0],
+            ar_count: [0, 0],
+        };
+    }
+
     pub fn from_bytes(bytes: Vec<u8>) -> Self {
         let data: Vec<u8> = bytes.get_slice(0, 12).unwrap();
         return Header{
@@ -58,4 +77,15 @@ impl Header {
        println!("Name Server Records: {}", self.ns_count.as_u16());
        println!("Additional Records: {}", self.ar_count.as_u16());
    } 
+
+   pub fn to_bytes(&self) -> Vec<u8> {
+      let mut res: Vec<u8> = vec![];
+      res.extend(self.id.to_vec());
+      res.extend(self.flags.to_vec());
+      res.extend(self.q_count.to_vec());
+      res.extend(self.an_count.to_vec());
+      res.extend(self.ns_count.to_vec());
+      res.extend(self.ar_count.to_vec());
+      return res;
+   }
 }
