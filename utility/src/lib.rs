@@ -32,6 +32,7 @@ impl Row for [u8;2] {
 pub trait Blob {
    fn get_slice(&self, start: u16, end: u16) -> Result<Vec<u8>, &'static str>;
    fn get_from_offset(&self, start: u8) -> Result<Vec<u8>, &'static str>;
+   fn to_socket_msg(&self) -> Result<&[u8], &'static str>;
 }
 
 impl Blob for Vec<u8> {
@@ -70,6 +71,10 @@ impl Blob for Vec<u8> {
             counter += 1;
         }
         return Ok(res);
+    }
+
+    fn to_socket_msg(&self) -> Result<&[u8], &'static str> {
+        return Ok(self.as_slice());
     }
 }
 

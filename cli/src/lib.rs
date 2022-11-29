@@ -1,5 +1,7 @@
 use std::env;
 
+pub mod socket;
+
 use parsing::Parser;
 
 pub struct Flags {
@@ -67,6 +69,4 @@ impl CLI {
             );
         q.print();
     }
-
-
 }

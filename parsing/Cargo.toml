@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 dns = { path = "../dns" }
+utility = { path = "../utility" }
