@@ -26,6 +26,12 @@ impl QClass {
             QClass::INET => "INET".to_string(),
         }
     }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        match self {
+            QClass::INET => vec![0b0000_0000, 0b0000_0001]
+        }
+    }
 }
 
 pub struct Question {
@@ -60,6 +66,14 @@ impl Question {
                q_type: RecordType::from_bytes(q_type),
                q_class 
            });
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut res: Vec<u8> = vec![];
+        res.extend(self.q_name.get_bytes());
+        res.extend(self.q_type.to_bytes());
+        res.extend(self.q_class.to_bytes());
+        return res;
     }
 
     pub fn print(&self) {

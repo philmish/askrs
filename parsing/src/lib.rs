@@ -1,4 +1,4 @@
-use utility::Blob;
+//use utility::Blob;
 use dns::question::Question;
 use dns::header::{self, Header};
 use dns::record::RecordType;
@@ -17,6 +17,14 @@ impl Query {
             header,
             question
         };
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut res: Vec<u8> = vec![];
+        res.extend(self.header.to_bytes());
+        res.extend(self.question.to_bytes());
+
+        return res;
     }
 
     pub fn print(&self) {

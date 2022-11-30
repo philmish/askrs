@@ -69,6 +69,16 @@ impl RecordType {
         }
     }
 
+    pub fn to_bytes(&self) -> Vec<u8> {
+        match self {
+            RecordType::A => vec![0,1],
+            RecordType::NS => vec![0b0000_0000, 0b0000_0010],
+            RecordType::CNAME => vec![0b0000_0000, 0b0000_0101],
+            RecordType::AAAA => vec![0b0000_0000, 0b0001_1100],
+            RecordType::MX => vec![0b0000_0000, 0b0000_1111],
+        }
+    }
+
     pub fn from_bytes(data: [u8;2]) -> Self {
         match data.as_u16() {
             1 => RecordType::A,
