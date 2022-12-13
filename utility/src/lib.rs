@@ -53,7 +53,6 @@ impl Blob for Vec<u8> {
             }
             count += 1;
         }).collect();
-        println!("Length of slice: {}", res.len());
         return Ok(res);
         
     }
@@ -62,15 +61,15 @@ impl Blob for Vec<u8> {
         if start as usize > self.len() {
             return Err("Start index out of bounds.");
         }
-        let c = self.to_vec();
-        let mut counter = 0;
+        let c = self.to_vec().into_iter();
+        let mut count = 0;
         let mut res: Vec<u8> = vec![];
-        for i in c.iter() {
-            if counter >= start {
-                res.push(*i);
+        let _: Vec<()> = c.map(|i| {
+            if count >= start {
+                res.push(i);
             }
-            counter += 1;
-        }
+            count += 1;
+        }).collect();
         return Ok(res);
     }
 

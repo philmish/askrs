@@ -41,7 +41,6 @@ impl Label {
                 continue;
             }
             len = data_vec.next().unwrap();
-            println!("Length of label being read: {}", len);
             if len == 0 {
                 complet = true;
                 continue;
@@ -147,6 +146,7 @@ impl Name {
     }
 
     pub fn from_bytes(data: Vec<u8>) -> Self {
+        println!("Creating Name from {} bytes", data.len());
         let c = data.to_vec();
         let labels = Label::read_labels(c).unwrap();
         let mut compressed = false;

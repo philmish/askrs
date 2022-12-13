@@ -28,10 +28,16 @@ impl UDPClient {
         let mut buf  = vec![0;4096];
         let send_bytes = socket.send(&msg_bytes).expect("Failed to send message over socket.");
         println!("Send {} bytes over socket", send_bytes);
-        match socket.recv(&mut buf) {
-            Ok(recieved) => println!("Recieved {} bytes over socket", recieved),
-            Err(e) => println!("Failed to read from socket: {e:?}"),
+        let length: usize = match socket.recv(&mut buf) {
+            Ok(recieved) => recieved,
+            Err(_e) => 0,
         };
-        return Ok(buf);
+        if length == 0 {
+            return Err(String::from("Failed to read bytes from socket."));
+        } else {
+            println!("Read {} bytes from socket connection.", length);
+            buf = buf.get_slice(0, length as u16).unwrap();
+            return Ok(buf);
+        }
     }
 }

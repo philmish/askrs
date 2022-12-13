@@ -2,6 +2,7 @@
 use dns::question::Question;
 use dns::header::{self, Header};
 use dns::record::RecordType;
+use utility::Blob;
 
 pub struct Query {
     header: header::Header,
@@ -43,5 +44,10 @@ impl Parser {
 
     pub fn parse_header(&self, data: Vec<u8>) -> Header {
         return Header::from_bytes(data);
+    }
+
+    pub fn parse_question(&self, data: Vec<u8>) -> Result<Question, &str> {
+        let chunk: Vec<u8> = data.get_from_offset(12).unwrap();
+        return Question::from_bytes(chunk);
     }
 }

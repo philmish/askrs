@@ -76,6 +76,8 @@ impl CLI {
         println!("Response length: {}", a.len());
         let resp_header = self.parser.parse_header(a.to_vec());
         resp_header.print();
+        let question = self.parser.parse_question(a.to_vec()).unwrap();
+        question.print();
 
     }
 }
