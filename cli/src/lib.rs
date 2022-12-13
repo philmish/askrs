@@ -67,6 +67,10 @@ impl CLI {
             self.flags.get_domain(),
             self.flags.get_r_type()
             );
+        let client = socket::UDPClient{};
+        let msg = q.to_bytes();
+        let a = client.send_and_recieve(msg, socket::DNSSocket::GOOGLE).unwrap();
+        println!("{}", a.len());
         q.print();
     }
 }
