@@ -11,7 +11,7 @@ pub struct Query {
 impl Query {
 
     fn new(domain: String, r_type: RecordType) -> Self {
-        let header = Header::new_query(None, None);
+        let header = Header::new_query(None);
         let question = Question::new(domain, Some(r_type), None);
         return Self{
             header,

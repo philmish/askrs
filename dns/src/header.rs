@@ -19,15 +19,11 @@ impl Flags {
     }
 
     pub fn set_to_query(&mut self) {
-        self.bytes.start_set_bits(0b1000_0000);
+        self.bytes.start_set_bits(0b0000_0000);
     }
 
     pub fn set_standard_query(&mut self) {
-        self.bytes.start_set_bits(0b1000_0000);
-    }
-
-    pub fn set_standard_inverse(&mut self) {
-        self.bytes.start_set_bits(0b1000_1000);
+        self.bytes.start_set_bits(0b0000_0000);
     }
 }
 
@@ -42,11 +38,10 @@ pub struct Header {
 
 impl Header {
 
-    pub fn new_query(rd: Option<bool>, inv: Option<bool>) -> Self {
+    pub fn new_query(rd: Option<bool>) -> Self {
         let mut flags = Flags::new();
         flags.set_to_query();
         if rd.unwrap_or(false) {flags.set_recursive()};
-        if inv.unwrap_or(false) {flags.set_standard_inverse()};
         return Self{
             id: [192, 175],
             flags: flags.data(),

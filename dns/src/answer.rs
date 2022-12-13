@@ -8,10 +8,6 @@ trait ParsableRecord {
     fn print_r_data(&self);
 }
 
-struct RecordData<T: ParsableRecord> {
-    content: T,
-}
-
 impl ParsableRecord for Name {
     fn print_r_data(&self) {
         println!("Name: {}", self.get_string().unwrap_or("is unparseable".to_string()));
