@@ -70,7 +70,12 @@ impl CLI {
         let client = socket::UDPClient{};
         let msg = q.to_bytes();
         let a = client.send_and_recieve(msg, socket::DNSSocket::GOOGLE).unwrap();
-        println!("{}", a.len());
+        println!("Send Question:");
         q.print();
+        println!("Recieved response:");
+        println!("Response length: {}", a.len());
+        let resp_header = self.parser.parse_header(a.to_vec());
+        resp_header.print();
+
     }
 }

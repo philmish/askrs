@@ -37,7 +37,11 @@ pub struct Parser;
 
 impl Parser {
 
-    pub fn new_query(&self, domain: String, r_type: String) -> Query{
+    pub fn new_query(&self, domain: String, r_type: String) -> Query {
         return Query::new(domain, RecordType::from_string(r_type));
+    }
+
+    pub fn parse_header(&self, data: Vec<u8>) -> Header {
+        return Header::from_bytes(data);
     }
 }

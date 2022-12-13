@@ -47,12 +47,13 @@ impl Blob for Vec<u8> {
         }
         let mut count = 0;
         let mut res: Vec<u8> = vec![];
-        let _ = c.map(|i| {
+        let _: Vec<()> = c.map(|i| {
             if count < end {
                 res.push(i);
             }
             count += 1;
-        });
+        }).collect();
+        println!("Length of slice: {}", res.len());
         return Ok(res);
         
     }
