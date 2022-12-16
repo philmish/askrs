@@ -26,8 +26,7 @@ impl UDPClient {
         socket.set_read_timeout(Some(Duration::from_secs(5))).expect("Failed to set socket read time out");
         socket.connect(server.get_ip()).expect("Failed to connect to DNS socket.");
         let mut buf  = vec![0;4096];
-        let send_bytes = socket.send(&msg_bytes).expect("Failed to send message over socket.");
-        println!("Send {} bytes over socket", send_bytes);
+        let _send_bytes = socket.send(&msg_bytes).expect("Failed to send message over socket.");
         let length: usize = match socket.recv(&mut buf) {
             Ok(recieved) => recieved,
             Err(_e) => 0,
@@ -35,7 +34,6 @@ impl UDPClient {
         if length == 0 {
             return Err(String::from("Failed to read bytes from socket."));
         } else {
-            println!("Read {} bytes from socket connection.", length);
             buf = buf.get_slice(0, length as u16).unwrap();
             return Ok(buf);
         }

@@ -1,7 +1,6 @@
 use std::net::Ipv4Addr;
 use utility::{Row, Blob};
 
-
 /*
  *
 QTYPE           value and meaning
@@ -99,7 +98,6 @@ pub struct ARecord {
 impl ARecord {
     
     pub fn from_bytes(data: Vec<u8>, offset: u8) -> Self {
-        println!("Parsing ARecord from data with length {} from offset {}", data.len(), offset);
         let bytes: Vec<u8> = data.to_vec().get_from_offset(offset).unwrap();
         let mut pos = 0;
         let mut fields: [u8;4];

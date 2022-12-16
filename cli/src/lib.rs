@@ -61,7 +61,6 @@ impl CLI {
     }
 
     pub fn run(&self) {
-        // TODO Implement answer parsing        
         let q = self.parser.new_query(
             self.flags.get_domain(),
             self.flags.get_r_type()
@@ -69,10 +68,8 @@ impl CLI {
         let client = socket::UDPClient{};
         let msg = q.to_bytes();
         let a = client.send_and_recieve(msg, socket::DNSSocket::GOOGLE).unwrap();
-        println!("Send Question:");
         q.print();
-        println!("Recieved response:");
-        println!("Response length: {}", a.len());
+        println!("----------------------");
         let resp_header = self.parser.parse_header(a.to_vec());
         resp_header.print();
         let question = self.parser.parse_question(a.to_vec()).unwrap();

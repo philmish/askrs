@@ -53,9 +53,7 @@ impl Header {
     }
 
     pub fn from_bytes(bytes: Vec<u8>) -> Self {
-        println!("Parsing headers from {} bytes.", bytes.len());
         let data: Vec<u8> = bytes.get_slice(0, 12).unwrap();
-        println!("Header parsing aquired chunk of size {}", data.len());
         return Header{
             id: data[0..2].try_into().unwrap(),
             flags: data[2..4].try_into().unwrap(),
@@ -67,8 +65,8 @@ impl Header {
     }
 
    pub fn print(&self) {
-       println!("ID: {:#01}", self.id.as_u16());
-       println!("Flags: {:#02}", self.flags.as_u16());
+       println!("ID: {:#01x}", self.id.as_u16());
+       println!("Flags: {:#02x}", self.flags.as_u16());
        println!("Question count: {}", self.q_count.as_u16());
        println!("Resource Records: {}", self.an_count.as_u16());
        println!("Name Server Records: {}", self.ns_count.as_u16());
