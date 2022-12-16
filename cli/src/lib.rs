@@ -61,7 +61,6 @@ impl CLI {
     }
 
     pub fn run(&self) {
-        // TODO Implement socket client to send question
         // TODO Implement answer parsing        
         let q = self.parser.new_query(
             self.flags.get_domain(),
@@ -78,6 +77,7 @@ impl CLI {
         resp_header.print();
         let question = self.parser.parse_question(a.to_vec()).unwrap();
         question.print();
-
+        let answer = self.parser.parse_answer(a.to_vec(), 12 + question.length()).unwrap();
+        answer.print();
     }
 }

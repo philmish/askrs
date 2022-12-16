@@ -1,4 +1,5 @@
-use utility::Row;
+use std::net::Ipv4Addr;
+use utility::{Row, Blob};
 
 
 /*
@@ -88,5 +89,37 @@ impl RecordType {
             15 => RecordType::MX,
             _ => RecordType::A,
         }
+    }
+}
+
+pub struct ARecord {
+    fields: [u8;4]
+}
+
+impl ARecord {
+    
+    pub fn from_bytes(data: Vec<u8>, offset: u8) -> Self {
+        println!("Parsing ARecord from data with length {} from offset {}", data.len(), offset);
+        let bytes: Vec<u8> = data.to_vec().get_from_offset(offset).unwrap();
+        let mut pos = 0;
+        let mut fields: [u8;4];
+        let mut i = bytes.into_iter();
+        if i.len() < 4  {
+            panic!("Parsing A Record from iterator with len {}", i.len());
+        }
+        fields = [0,0,0,0];
+        while pos < 4 {
+            fields[pos] = i.next().unwrap();
+            pos += 1;
+        }
+        return ARecord{fields};
+    }
+
+    pub fn as_ipv4(&self) -> Ipv4Addr {
+        return Ipv4Addr::new(self.fields[0], self.fields[1], self.fields[2], self.fields[3]);
+    }
+
+    pub fn print(&self) {
+        println!("IP: {}.{}.{}.{}", self.fields[0], self.fields[1], self.fields[2], self.fields[3])
     }
 }

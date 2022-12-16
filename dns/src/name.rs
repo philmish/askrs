@@ -145,9 +145,9 @@ impl Name {
         return len;
     }
 
-    pub fn from_bytes(data: Vec<u8>) -> Self {
+    pub fn from_bytes(data: Vec<u8>, offset: u8) -> Self {
         println!("Creating Name from {} bytes", data.len());
-        let c = data.to_vec();
+        let c = data.to_vec().get_from_offset(offset).unwrap();
         let labels = Label::read_labels(c).unwrap();
         let mut compressed = false;
         for i in labels.to_vec().into_iter() {
@@ -296,7 +296,7 @@ mod tests {
             0,
         ];
         let expected_name: String = String::from("api.google.com");
-        let compressed_name = Name::from_bytes(compressed);
+        let compressed_name = Name::from_bytes(compressed, 0);
         let decompressed = compressed_name.decompress(data.to_vec()).unwrap();
         assert_eq!(expected_name, decompressed.get_string().unwrap());
         assert_eq!(16, decompressed.get_bytes_length());

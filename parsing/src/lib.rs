@@ -1,3 +1,4 @@
+use dns::answer::Answer;
 //use utility::Blob;
 use dns::question::Question;
 use dns::header::{self, Header};
@@ -49,5 +50,10 @@ impl Parser {
     pub fn parse_question(&self, data: Vec<u8>) -> Result<Question, &str> {
         let chunk: Vec<u8> = data.get_from_offset(12).unwrap();
         return Question::from_bytes(chunk);
+    }
+
+    //TODO make it possible to parse multiple answer records
+    pub fn parse_answer(&self, data: Vec<u8>, offset: u8) -> Result<Answer, String> {
+        return Answer::from_bytes(data, offset);
     }
 }

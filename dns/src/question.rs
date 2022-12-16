@@ -50,7 +50,7 @@ impl Question {
     }
 
     pub fn from_bytes(data: Vec<u8>) -> Result<Self, &'static str> {
-       let mut name = name::Name::from_bytes(data.to_vec()) ;
+       let mut name = name::Name::from_bytes(data.to_vec(), 0) ;
        if name.is_compressed() {
            name = name.decompress(data.to_vec()).unwrap();
        }
@@ -80,5 +80,9 @@ impl Question {
         println!("Domain: {}", self.q_name.get_string().unwrap());
         println!("Question Type: {}", self.q_type.to_string());
         println!("Question Class: {}", self.q_class.to_string());
+    }
+
+    pub fn length(&self) -> u8 {
+        return self.q_name.get_bytes_length() + 4;
     }
 }
