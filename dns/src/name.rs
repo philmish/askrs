@@ -12,7 +12,6 @@ impl Label {
 
     pub fn from_string(name: String) -> Result<Self, &'static str> {
         let bytes = name.as_bytes().to_vec();
-        println!("Length of part as string: {}", bytes.len() as u8);
         if bytes.len() > 255 {
             return Err("Name exceeds max size for Label.");
         }
@@ -46,7 +45,6 @@ impl Label {
                 continue;
             } else if len == 192 {
                 let offset = data_vec.next().unwrap();
-                println!("Found compression with offset {}", offset);
                 labels.push(
                     Label { 
                         length: len,
@@ -146,7 +144,6 @@ impl Name {
     }
 
     pub fn from_bytes(data: Vec<u8>, offset: u8) -> Self {
-        println!("Creating Name from {} bytes", data.len());
         let c = data.to_vec().get_from_offset(offset).unwrap();
         let labels = Label::read_labels(c).unwrap();
         let mut compressed = false;
@@ -319,9 +316,7 @@ mod tests {
             0,
         ];
         let name = Name::from_string(String::from("google.com")).unwrap();
-        println!("Length of name: {}", name.get_bytes_length());
         for (idx, v) in name.get_bytes().iter().enumerate() {
-            println!("Current byte in name {:#} at index {}", v, idx);
             assert_eq!(&data[idx], v);
         }
 

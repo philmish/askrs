@@ -2,26 +2,9 @@ use utility::{Row, Blob};
 
 use crate::{name::Name, record::{RecordType, ARecord}};
 
-
-trait ParsableRecord {
-    fn read_r_data(data: Vec<u8>, offset: Option<u8>) -> Self;
-    fn print_r_data(&self);
-}
-
-impl ParsableRecord for Name {
-    fn print_r_data(&self) {
-        println!("Name: {}", self.get_string().unwrap_or("is unparseable".to_string()));
-    }
-
-    fn read_r_data(data: Vec<u8>, offset: Option<u8>) -> Self {
-        let bytes = data.get_from_offset(offset.unwrap_or(0)).unwrap();
-        return Name::from_bytes(bytes, 0);
-    }
-}
-
 //TODO Find a better way to parse answer data for Address or CNAME
 //TODO make length a u16 and ttl a u32 as they are used as such
-//TODO find a way to use traits for a_data field
+//TODO find a way to use generics and traits for a_data field
 pub struct Answer {
     name: Name,
     r_type: RecordType,
