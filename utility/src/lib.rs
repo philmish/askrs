@@ -6,6 +6,59 @@ pub trait Row {
     fn end_unset_bits(&mut self, byte: u8);
 }
 
+pub trait Byte {
+    fn bit_is_set(&self, pos: u8) -> bool;
+    fn take_left_nibble(&self) -> u8;
+    fn take_right_nibble(&self) -> u8;
+    fn set_bits(&mut self, map: u8);
+    fn unset_bits(&mut self, map: u8);
+}
+
+impl Byte for u8 {
+
+    fn bit_is_set(&self, pos: u8) -> bool {
+        if pos > 7 {
+            return false;
+        }
+        for n in 0..8 {
+            if n == pos {
+                return 1 == self >> n & 1
+            }
+        }
+        return false;
+    }
+
+    fn take_left_nibble(&self) -> u8 {
+        let mut res: u8 = 0;
+        let mut dec_val: u8 = 16;
+        for n in 0..8 {
+            if n > 3 {
+                res += dec_val * (self >> n & 1);
+                dec_val *= 2;
+            }
+        }
+        return res;
+    }
+
+    fn take_right_nibble(&self) -> u8 {
+        let mut res: u8 = 0;
+        let mut dec_val: u8 = 1;
+        for n in 0..4 {
+            res += dec_val * (self >> n & 1);
+            dec_val *= 2;
+        }
+        return res;
+    }
+
+    fn set_bits(&mut self, map: u8) {
+       *self |= map;
+    }
+
+    fn unset_bits(&mut self, map: u8) {
+        *self &= map;
+    }
+}
+
 impl Row for [u8;2] {
 
     fn as_u16(&self) -> u16 {
@@ -13,11 +66,11 @@ impl Row for [u8;2] {
     }
 
     fn start_set_bits(&mut self, byte: u8) {
-        self[0] |= byte;
+        self[0].set_bits(byte);
     }
 
     fn start_unset_bits(&mut self, byte: u8) {
-        self[0] &= byte;
+        self[0].unset_bits(byte);
     }
 
     fn end_set_bits(&mut self, byte: u8) {

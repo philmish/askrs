@@ -52,6 +52,14 @@ impl Header {
         };
     }
 
+    pub fn an_count(&self) -> u16 {
+        return self.an_count.as_u16();
+    }
+
+    pub fn q_count(&self) -> u16 {
+        return self.q_count.as_u16();
+    }
+
     pub fn from_bytes(bytes: Vec<u8>) -> Self {
         let data: Vec<u8> = bytes.get_slice(0, 12).unwrap();
         return Header{
