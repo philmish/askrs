@@ -25,6 +25,19 @@ impl RCODE {
         };
     }
 
+    pub fn is_err(&self) -> bool {
+        return match self {
+            RCODE::NOERR => false,
+            RCODE::FMTERR => true,
+            RCODE::SRVFAIL => true,
+            RCODE::NAMEERR => true,
+            RCODE::NOTIMPL => true,
+            RCODE::REFUSED => true,
+            RCODE::UNKNOWN => true,
+        };
+
+    }
+
     pub fn print(&self) {
         match self {
             RCODE::NOERR => println!("No Errors encountered."),

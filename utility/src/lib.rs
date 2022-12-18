@@ -74,11 +74,11 @@ impl Row for [u8;2] {
     }
 
     fn end_set_bits(&mut self, byte: u8) {
-        self[1] |= byte;
+        self[1].set_bits(byte);
     }
 
     fn end_unset_bits(&mut self, byte: u8) {
-        self[1] &= byte;
+        self[1].unset_bits(byte);
     }
 }
 

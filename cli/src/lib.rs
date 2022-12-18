@@ -1,8 +1,8 @@
 use std::env;
+use parsing::{Parser, Query};
 
 pub mod socket;
 
-use parsing::Parser;
 
 pub struct Flags {
     domain: String,
@@ -40,7 +40,6 @@ impl Flags {
     pub fn print(&self) {
         println!("Domain: {}", self.domain);
         println!("Record Type: {}", self.record);
-
     }
 }
 
@@ -60,20 +59,33 @@ impl CLI {
         };
     }
 
+    fn send_query(&self, q: Query, srv: Option<socket::DNSSocket>) -> Vec<u8> {
+        let client = socket::UDPClient{};
+        let msg = q.to_bytes();
+        let a = client.send_and_recieve(
+            msg,
+            srv.unwrap_or(socket::DNSSocket::GOOGLE)
+            )
+            .unwrap();
+        q.print();
+        return a;
+    }
+
     pub fn run(&self) {
         let q = self.parser.new_query(
             self.flags.get_domain(),
             self.flags.get_r_type()
             );
-        let client = socket::UDPClient{};
-        let msg = q.to_bytes();
-        let a = client.send_and_recieve(msg, socket::DNSSocket::GOOGLE).unwrap();
-        q.print();
+        let a = self.send_query(q, None);
         println!("----------------------");
         let resp_header = self.parser.parse_header(a.to_vec());
         resp_header.print();
         let question = self.parser.parse_question(a.to_vec()).unwrap();
         question.print();
+        if resp_header.rcode().is_err() {
+            resp_header.rcode().print();
+            return;
+        }
         let answer = self.parser.parse_answer(a.to_vec(), 12 + question.length()).unwrap();
         answer.print();
     }
