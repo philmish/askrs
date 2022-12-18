@@ -1,4 +1,42 @@
-use utility::{Row,Blob};
+use utility::{Row,Blob, Byte};
+
+pub enum RCODE {
+    NOERR,
+    FMTERR,
+    SRVFAIL,
+    NAMEERR,
+    NOTIMPL,
+    REFUSED,
+    UNKNOWN,
+}
+
+impl RCODE {
+    
+    pub fn from_byte(byte: u8) -> RCODE {
+        let n: u8 = byte.take_right_nibble();
+        return match n {
+            0 => RCODE::NOERR,
+            1 => RCODE::FMTERR,
+            2 => RCODE::SRVFAIL,
+            3 => RCODE::NAMEERR,
+            4 => RCODE::NOTIMPL,
+            5 => RCODE::REFUSED,
+            _ => RCODE::UNKNOWN,
+        };
+    }
+
+    pub fn print(&self) {
+        match self {
+            RCODE::NOERR => println!("No Errors encountered."),
+            RCODE::FMTERR => println!("The Name Server was unable to interpret the query."),
+            RCODE::SRVFAIL => println!("The Name Server was unable to process this query due to a problem with the name server."),
+            RCODE::NAMEERR => println!("Meaningful only for responses from an authoritative name server, this code signifies that the domain name referenced in the query does not exist."),
+            RCODE::NOTIMPL => println!("The name server does not support the requested kind of query."),
+            RCODE::REFUSED => println!("The name server refuses to perform the specified operation for policy reasons.  For example, a name server may not wish to provide the information to the particular requester, or a name server may not wish to perform a particular operation (e.g., zone"),
+            RCODE::UNKNOWN => println!("An unknown error code was encountered. Check your parsing.")
+        }
+    }
+}
 
 pub struct Flags {
     bytes: [u8;2],
@@ -58,6 +96,10 @@ impl Header {
 
     pub fn q_count(&self) -> u16 {
         return self.q_count.as_u16();
+    }
+
+    pub fn rcode(&self) -> RCODE {
+        return RCODE::from_byte(self.flags[1]);
     }
 
     pub fn from_bytes(bytes: Vec<u8>) -> Self {
