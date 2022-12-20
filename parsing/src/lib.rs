@@ -56,4 +56,8 @@ impl Parser {
     pub fn parse_answer(&self, data: Vec<u8>, offset: u8) -> Result<Answer, String> {
         return Answer::from_bytes(data, offset);
     }
+
+    pub fn parse_answers(&self, data: Vec<u8>, start_offset: u8, r_count: usize) -> Result<Vec<Answer>, String> {
+        return Answer::multiple_from_bytes(data, start_offset, r_count);
+    }
 }

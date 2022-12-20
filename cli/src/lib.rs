@@ -86,7 +86,18 @@ impl CLI {
             resp_header.rcode().print();
             return;
         }
-        let answer = self.parser.parse_answer(a.to_vec(), 12 + question.length()).unwrap();
-        answer.print();
+        let offset: u8 = 12 + question.length();
+        if resp_header.an_count() == 1 {
+            let answer = self.parser.parse_answer(a.to_vec(), offset).unwrap();
+            answer.print();
+            return;
+        } else if resp_header.an_count() > 1 {
+            let answers = self.parser
+                              .parse_answers(a.to_vec(), offset, resp_header.an_count() as usize)
+                              .unwrap();
+            for an in answers.iter() {
+               an.print(); 
+            }
+        }
     }
 }

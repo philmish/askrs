@@ -22,6 +22,10 @@ impl Answer {
         ((self.ttl[2] as u32) << 8) +
         ((self.ttl[3] as u32) << 0)
     }
+
+    fn length(&self) -> u8 {
+        return 12 + self.length.as_u16() as u8;
+    }
     
     pub fn print(&self) {
         println!("Name: {}", self.name.get_string().unwrap());
@@ -84,7 +88,24 @@ impl Answer {
         });
 
     }
+
+    pub fn multiple_from_bytes(data: Vec<u8>, start_offset: u8, r_count: usize) -> Result<Vec<Self>, String> {
+        let mut curr_offset: u8 = start_offset; 
+        let mut res: Vec<Self> = vec![];
+        let mut answer: Self;
+        for _n in 0..r_count {
+           answer = Self::from_bytes(data.to_vec(), curr_offset).unwrap();
+           curr_offset += answer.length();
+           res.push(answer);
+        }
+        if res.len() == 0 {
+            return Err(String::from("Something went wrong parsing the answer records. Could parse 0."));
+        } else {
+            return Ok(res);
+        }
+    }
 }
+
 
 #[cfg(test)]
 mod tests {
