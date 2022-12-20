@@ -36,6 +36,18 @@ pub enum RecordType {
     NS,
 }
 
+impl Clone for RecordType {
+    fn clone(&self) -> Self {
+        match self {
+            RecordType::A => RecordType::A,
+            RecordType::AAAA => RecordType::AAAA,
+            RecordType::CNAME => RecordType::CNAME,
+            RecordType::NS => RecordType::NS,
+            RecordType::MX => RecordType::MX,
+        }
+    }
+}
+
 impl RecordType {
 
     pub fn as_bytes(r_type: RecordType) -> [u8;2] {

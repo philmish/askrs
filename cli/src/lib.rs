@@ -1,5 +1,5 @@
 use std::env;
-use parsing::{Parser, Query};
+use parsing::{Parser, Query, Response};
 
 pub mod socket;
 
@@ -78,28 +78,7 @@ impl CLI {
             );
         let a = self.send_query(q, None);
         println!("----------------------");
-        let resp_header = self.parser.parse_header(a.to_vec());
-        resp_header.print();
-        let question = self.parser.parse_question(a.to_vec()).unwrap();
-        question.print();
-        if resp_header.rcode().is_err() {
-            resp_header.rcode().print();
-            return;
-        }
-        let offset: u8 = 12 + question.length();
-        if resp_header.an_count() == 1 {
-            let answer = self.parser.parse_answer(a.to_vec(), offset).unwrap();
-            answer.print();
-            return;
-        } else if resp_header.an_count() > 1 {
-            let answers = self.parser
-                              .parse_answers(a.to_vec(), offset, resp_header.an_count() as usize)
-                              .unwrap();
-            for an in answers.iter() {
-               an.print(); 
-            }
-        } else {
-            println!("No answers received.");
-        }
+        let resp = Response::from_bytes(a, Parser{}).unwrap();
+        resp.print();
     }
 }

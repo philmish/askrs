@@ -14,7 +14,21 @@ pub struct Answer {
     a_data: Vec<u8>,
 }
 
+impl Clone for Answer {
+    fn clone(&self) -> Self {
+        return Answer {
+            name: self.name.clone(),
+            r_type: self.r_type.clone(),
+            class: self.class.clone(),
+            ttl: self.ttl.clone(),
+            length: self.length.clone(),
+            a_data: self.a_data.to_vec(),
+        };
+    }
+}
+
 impl Answer {
+
 
     fn ttl_as_u32(&self) -> u32 {
         ((self.ttl[0] as u32) << 24) +

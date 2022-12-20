@@ -35,6 +35,57 @@ impl Query {
     }
 }
 
+pub struct Response {
+    bytes: Vec<u8>,
+    header: dns::header::Header,
+    question: dns::question::Question,
+    answers: Vec<dns::answer::Answer>,
+}
+
+impl Response {
+
+    pub fn from_bytes(data: Vec<u8>, parser: Parser) -> Result<Self, String> {
+        let resp_header = parser.parse_header(data.to_vec());
+        let question = parser.parse_question(data.to_vec()).unwrap();
+        if resp_header.rcode().is_err() {
+            resp_header.rcode().print();
+            return Err("Error response recieved".to_string());
+        }
+        let offset: u8 = 12 + question.length();
+        if resp_header.an_count() > 0 {
+            let answers = parser.parse_answers(data.to_vec(), offset, resp_header.an_count() as usize)
+                                .unwrap();
+            let resp: Response = Response { 
+                bytes: data.to_vec(), 
+                header: resp_header, 
+                question, 
+                answers 
+            };
+            return Ok(resp);
+        } else {
+            let resp: Response = Response { 
+                bytes: data.to_vec(), 
+                header: resp_header, 
+                question, 
+                answers: vec![]
+            };
+            return Ok(resp);
+        }
+    }
+
+    pub fn get_bytes(&self) -> Vec<u8> {
+        return self.bytes.to_vec();
+    }
+
+    pub fn print(&self) {
+        self.header.print();
+        self.question.print();
+        for an in self.answers.to_vec().iter() {
+            an.print();
+        }
+    }
+}
+
 pub struct Parser;
 
 impl Parser {
@@ -52,7 +103,6 @@ impl Parser {
         return Question::from_bytes(chunk);
     }
 
-    //TODO make it possible to parse multiple answer records
     pub fn parse_answer(&self, data: Vec<u8>, offset: u8) -> Result<Answer, String> {
         return Answer::from_bytes(data, offset);
     }

@@ -110,6 +110,15 @@ pub struct Name {
     compressed: bool,
 }
 
+impl Clone for Name {
+    fn clone(&self) -> Self {
+        return Name {
+            labels: self.labels.to_vec(),
+            compressed: self.compressed.clone(),
+        };
+    }
+}
+
 impl Name {
 
     pub fn from_string(name: String) -> Result<Self, &'static str> {
