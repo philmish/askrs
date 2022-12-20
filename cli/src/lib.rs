@@ -98,6 +98,8 @@ impl CLI {
             for an in answers.iter() {
                an.print(); 
             }
+        } else {
+            println!("No answers received.");
         }
     }
 }
