@@ -14,6 +14,14 @@ impl DNSSocket {
             DNSSocket::CLOUDFLARE => SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(1,1,1,1), 53)),
         }
     }
+
+    pub fn from_string(name: &str) -> Self {
+        match name {
+            "google" => DNSSocket::GOOGLE,
+            "cloudflare" => DNSSocket::CLOUDFLARE,
+            _ => DNSSocket::GOOGLE
+        }
+    }
 }
 
 pub struct UDPClient{}
