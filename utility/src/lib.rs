@@ -17,9 +17,6 @@ pub trait Byte {
 impl Byte for u8 {
 
     fn bit_is_set(&self, pos: u8) -> bool {
-        if pos > 7 {
-            return false;
-        }
         for n in 0..8 {
             if n == pos {
                 return 1 == self >> n & 1
@@ -134,6 +131,7 @@ impl Blob for Vec<u8> {
 #[cfg(test)]
 mod tests {
     use crate::Blob;
+    use crate::Byte;
     use crate::Row;
 
     #[test]
@@ -163,5 +161,13 @@ mod tests {
         let a: [u8;2] = [0,1];
         let expect_u16: u16 = 1;
         assert_eq!(a.as_u16(), expect_u16);
+    }
+
+    #[test]
+    fn test_bit_is_set() {
+        let val: u8 = 0b01010101;
+        for n in 0..8 {
+            assert_eq!((n + 1) % 2 == 1, val.bit_is_set(n));
+        }
     }
 }
