@@ -1,5 +1,4 @@
 use dns::answer::Answer;
-//use utility::Blob;
 use dns::question::Question;
 use dns::header::{self, Header};
 use dns::record::RecordType;
