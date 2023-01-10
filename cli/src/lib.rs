@@ -1,4 +1,5 @@
 use clap::Parser as clapParser;
+use clap::ArgAction;
 use parsing::{Parser, Query, Response};
 
 pub mod socket;
@@ -12,14 +13,14 @@ struct Flags {
 
     /// Target adress or domain to request records for.
     #[clap(short, long)]
-    target: String,
+    uri: String,
 
     /// DNS server to use for request.
     #[clap(short, long, default_value = "google")]
     server: String,
 
     /// Record type to request (A, AAAA, MX, CNAME)
-    #[clap(short, long, default_value = "A")]
+    #[clap(long, default_value = "A")]
     record: String,
 
     /* TODO Implement boolean flag for recursion desired
@@ -27,6 +28,9 @@ struct Flags {
     #[clap(short = 'rd', long, takes_value = false)]
     rd: bool,
     */
+    /// Recursive Query
+    #[clap(short = 'r', long = "recursion_desired", action = ArgAction::SetTrue)]
+    rd: bool
 }
 
 pub struct CLI {
@@ -59,10 +63,10 @@ impl CLI {
 
     pub fn run(&self) {
         let q = self.parser.new_query(
-            self.flags.target.clone(),
+            self.flags.uri.clone(),
             self.flags.record.clone(),
             // PLACEHOLDER until rd cli flag is implemented
-            false,
+            self.flags.rd.clone(),
             );
         let a = self.send_query(q, socket::DNSSocket::from_string(&self.flags.server));
         println!("----------------------");
