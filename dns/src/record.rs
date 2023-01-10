@@ -1,4 +1,4 @@
-use std::net::Ipv4Addr;
+use std::net::{Ipv4Addr, Ipv6Addr};
 use utility::{Row, Blob};
 
 /*
@@ -130,6 +130,67 @@ impl ARecord {
     }
 
     pub fn print(&self) {
-        println!("IP: {}.{}.{}.{}", self.fields[0], self.fields[1], self.fields[2], self.fields[3])
+        println!("IPv4: {}", self.as_ipv4());
+    }
+}
+
+pub struct AAAARecord {
+    bytes: [u8; 16]
+}
+
+impl AAAARecord {
+
+    pub fn from_bytes(data: Vec<u8>, offset: u8) -> Self {
+        let bytes = data.to_vec().get_from_offset(offset).unwrap();
+        let mut pos: usize = 0;
+        let mut buf: [u8;16];
+        let mut iter = bytes.into_iter();
+        if iter.len() < 16 {
+            panic!("Trying to parse AAAA record from byte vector of length {}", iter.len());
+        }
+        buf = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        while pos < 16 {
+            buf[pos] = iter.next().unwrap();
+            pos += 1;
+        }
+        return Self { bytes: buf };
+    }
+
+    pub fn as_ipv6(&self) -> Ipv6Addr {
+        let mut fields: [u16;8] = [0,0,0,0,0,0,0,0];
+        let mut pos: usize = 0;
+        let mut buf: [u8;2];
+        for el in self.bytes.chunks(2) {
+            buf = [el[0], el[1]];
+            fields[pos] = buf.as_u16();
+            pos += 1;
+        }
+        return Ipv6Addr::new(
+            fields[0],
+            fields[1],
+            fields[2],
+            fields[3],
+            fields[4],
+            fields[5],
+            fields[6],
+            fields[7]
+        );
+    }
+
+    pub fn print(&self) {
+        println!("IPv6: {}", self.as_ipv6());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::AAAARecord;
+
+    #[test]
+    fn test_aaaa_record() {
+        let data: Vec<u8> = vec![244, 144, 131, 10, 253, 198, 107, 97, 126, 155, 106, 122, 200, 157, 89, 237];
+        let record = AAAARecord::from_bytes(data.to_vec(), 0);
+        record.print();
     }
 }
