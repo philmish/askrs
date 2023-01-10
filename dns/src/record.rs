@@ -231,6 +231,24 @@ impl MXRecord {
     }
 }
 
+pub struct NSRecord {
+    nsdname: Name,
+}
+
+impl NSRecord {
+    pub fn from_bytes(data: Vec<u8>, src: Vec<u8>, offset: u8) -> Self {
+        let mut nsdname = Name::from_bytes(data.to_vec(), offset);
+        if nsdname.is_compressed() {
+            nsdname = nsdname.decompress(src.to_vec()).unwrap();
+        }
+        return Self{nsdname};
+    }
+
+    pub fn print(&self) {
+        println!("Nameserver: {}", self.nsdname.get_string().unwrap());
+    }
+}
+
 #[cfg(test)]
 mod tests {
 

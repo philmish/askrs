@@ -1,6 +1,6 @@
 use utility::{Row, Blob};
 
-use crate::{name::Name, record::{RecordType, ARecord, AAAARecord, CNAMERecord, MXRecord}};
+use crate::{name::Name, record::{RecordType, ARecord, AAAARecord, CNAMERecord, MXRecord, NSRecord}};
 
 //TODO make length a u16 and ttl a u32 as they are used as such
 //TODO find a way to use generics and traits for a_data field
@@ -51,6 +51,7 @@ impl Answer {
             "AAAA" => AAAARecord::from_bytes(self.a_data.to_vec(), 0).print(),
             "CNAME" => CNAMERecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
             "MX" => MXRecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
+            "NS" => NSRecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
             _ => println!("unparseable answer data.")
         };
     }
