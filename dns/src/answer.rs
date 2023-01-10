@@ -1,6 +1,6 @@
 use utility::{Row, Blob};
 
-use crate::{name::Name, record::{RecordType, ARecord}};
+use crate::{name::Name, record::{RecordType, ARecord, AAAARecord}};
 
 //TODO Find a better way to parse answer data for Address or CNAME
 //TODO make length a u16 and ttl a u32 as they are used as such
@@ -49,6 +49,7 @@ impl Answer {
         println!("Length: {}", self.length.as_u16());
         match self.r_type.to_string().as_str() {
             "A" => ARecord::from_bytes(self.a_data.to_vec(), 0).print(),
+            "AAAA" => AAAARecord::from_bytes(self.a_data.to_vec(), 0).print(),
             _ => println!("unparseable answer data.")
         };
     }
