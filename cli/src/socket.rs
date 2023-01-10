@@ -5,6 +5,7 @@ use utility::Blob;
 pub enum DNSSocket {
     GOOGLE,
     CLOUDFLARE,
+    QUAD9,
 }
 
 impl DNSSocket {
@@ -12,6 +13,7 @@ impl DNSSocket {
         match self {
             DNSSocket::GOOGLE => SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(8,8,4,4), 53)),
             DNSSocket::CLOUDFLARE => SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(1,1,1,1), 53)),
+            DNSSocket::QUAD9 => SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(9, 9, 9, 9), 53)),
         }
     }
 
@@ -19,6 +21,7 @@ impl DNSSocket {
         match name {
             "google" => DNSSocket::GOOGLE,
             "cloudflare" => DNSSocket::CLOUDFLARE,
+            "quad9" => DNSSocket::QUAD9,
             _ => DNSSocket::GOOGLE
         }
     }
