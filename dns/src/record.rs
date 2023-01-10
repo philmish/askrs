@@ -28,7 +28,7 @@ MAILA           254 A request for mail agent RRs (Obsolete - see MX)
 *               255 A request for all records
 *
 */
-//TODO implement CNAME, MX and NS Records
+//TODO implement NS Records
 
 pub enum RecordType {
     A,
@@ -201,6 +201,33 @@ impl CNAMERecord {
 
     pub fn print(&self) {
        println!("Name: {}", self.name.get_string().unwrap());
+    }
+}
+
+pub struct MXRecord {
+    preference: u16,
+    exchange: Name,
+}
+
+impl MXRecord {
+    
+    pub fn from_bytes(data: Vec<u8>, src: Vec<u8>, offset: u8) -> Self {
+        let pref_bytes: Vec<u8> = data.to_vec()
+                                  .get_from_offset(offset)
+                                  .unwrap()
+                                  .get_slice(0, 2)
+                                  .unwrap();
+        let mut name = Name::from_bytes(data.to_vec(), offset + 2);
+        if name.is_compressed() {
+            name = name.decompress(src).unwrap();
+        }
+        let pref: u16 = [pref_bytes[0], pref_bytes[1]].as_u16();
+        return Self { preference: pref , exchange: name };
+    }
+
+    pub fn print(&self) {
+        println!("Preference: {}", self.preference);
+        println!("{}", self.exchange.get_string().unwrap());
     }
 }
 

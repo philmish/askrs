@@ -1,8 +1,7 @@
 use utility::{Row, Blob};
 
-use crate::{name::Name, record::{RecordType, ARecord, AAAARecord, CNAMERecord}};
+use crate::{name::Name, record::{RecordType, ARecord, AAAARecord, CNAMERecord, MXRecord}};
 
-//TODO Find a better way to parse answer data for Address or CNAME
 //TODO make length a u16 and ttl a u32 as they are used as such
 //TODO find a way to use generics and traits for a_data field
 pub struct Answer {
@@ -51,6 +50,7 @@ impl Answer {
             "A" => ARecord::from_bytes(self.a_data.to_vec(), 0).print(),
             "AAAA" => AAAARecord::from_bytes(self.a_data.to_vec(), 0).print(),
             "CNAME" => CNAMERecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
+            "MX" => MXRecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
             _ => println!("unparseable answer data.")
         };
     }
