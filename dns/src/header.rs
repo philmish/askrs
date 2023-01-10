@@ -55,7 +55,7 @@ impl Header {
 
    pub fn print(&self) {
        println!("ID: {:#01x}", self.id.as_u16());
-       println!("Flags: {:#02x}", self.flags.data().as_u16());
+       self.flags.print();
        println!("Question count: {}", self.q_count.as_u16());
        println!("Resource Records: {}", self.an_count.as_u16());
        println!("Name Server Records: {}", self.ns_count.as_u16());

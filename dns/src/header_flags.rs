@@ -82,6 +82,42 @@ RCODE           Response code - this 4 bit field is set as part of
  *
  */
 
+pub enum OPCODE {
+    QUERY,
+    IQUERY,
+    STATUS,
+    UNKNOWN,
+}
+
+impl OPCODE {
+
+    pub fn from_byte(byte: u8) -> Self {
+        let mut code: i32 = 0;
+        let mut pow: u32 = 0;
+        for n in 3..7 {
+            if byte.bit_is_set(n) {
+                code += i32::pow(2, pow);
+            }
+            pow += 1;
+        }
+        return match code {
+            0 => OPCODE::QUERY,
+            1 => OPCODE::IQUERY,
+            2 => OPCODE::STATUS,
+            _ => OPCODE::UNKNOWN,
+        }
+    }
+
+    pub fn print(&self) {
+        match self {
+            OPCODE::QUERY => println!("OPCODE: Query"),
+            OPCODE::IQUERY => println!("OPCODE: Inverse Query"),
+            OPCODE::STATUS => println!("OPCODE: Server Status"),
+            OPCODE::UNKNOWN => println!("OPCODE: Unknown"),
+        }
+    }
+}
+
 pub enum RCODE {
     NOERR,
     FMTERR,
@@ -167,5 +203,32 @@ impl Flags {
 
     pub fn get_rcode(&self) -> RCODE {
         return RCODE::from_byte(self.bytes[1]);
+    }
+
+    pub fn is_aa(&self) -> bool {
+        return self.bytes[0].bit_is_set(2);
+    }
+
+    pub fn is_truncated(&self) -> bool {
+        return self.bytes[0].bit_is_set(1);
+    }
+
+    pub fn is_recursion_desired(&self) -> bool {
+        return self.bytes[0].bit_is_set(0);
+    }
+
+    pub fn is_recursion_available(&self) -> bool {
+        return self.bytes[1].bit_is_set(7);
+    }
+
+    pub fn print(&self) {
+        let aa = if self.is_aa() {"Authoritative Answer: True"} else {"Authoritative Answer: False"};
+        let rd = if self.is_recursion_desired() {"Recursive: True"} else {"Recursive: False"};
+        let ra = if self.is_recursion_available() {"Recursion Available: True"} else {"Recursion Available: False"};
+        OPCODE::from_byte(self.bytes[0]).print();
+        println!("{}", aa);
+        println!("{}", rd);
+        println!("{}", ra);
+        self.get_rcode().print()
     }
 }
