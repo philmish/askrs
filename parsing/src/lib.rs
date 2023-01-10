@@ -12,8 +12,8 @@ pub struct Query {
 
 impl Query {
 
-    fn new(domain: String, r_type: RecordType) -> Self {
-        let header = Header::new_query(None);
+    fn new(domain: String, r_type: RecordType, rd: bool) -> Self {
+        let header = Header::new_query(Some(rd));
         let question = Question::new(domain, Some(r_type), None);
         return Self{
             header,
@@ -90,8 +90,8 @@ pub struct Parser;
 
 impl Parser {
 
-    pub fn new_query(&self, domain: String, r_type: String) -> Query {
-        return Query::new(domain, RecordType::from_string(r_type));
+    pub fn new_query(&self, domain: String, r_type: String, rd: bool) -> Query {
+        return Query::new(domain, RecordType::from_string(r_type), rd);
     }
 
     pub fn parse_header(&self, data: Vec<u8>) -> Header {

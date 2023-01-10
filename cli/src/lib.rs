@@ -21,6 +21,12 @@ struct Flags {
     /// Record type to request (A, AAAA, MX, CNAME)
     #[clap(short, long, default_value = "A")]
     record: String,
+
+    /* TODO Implement boolean flag for recursion desired
+    /// Recursive Query
+    #[clap(short = 'rd', long, takes_value = false)]
+    rd: bool,
+    */
 }
 
 pub struct CLI {
@@ -54,7 +60,9 @@ impl CLI {
     pub fn run(&self) {
         let q = self.parser.new_query(
             self.flags.target.clone(),
-            self.flags.record.clone()
+            self.flags.record.clone(),
+            // PLACEHOLDER until rd cli flag is implemented
+            false,
             );
         let a = self.send_query(q, socket::DNSSocket::from_string(&self.flags.server));
         println!("----------------------");

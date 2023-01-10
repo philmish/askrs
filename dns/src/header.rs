@@ -37,6 +37,14 @@ impl Header {
         return self.q_count.as_u16();
     }
 
+    pub fn ns_count(&self) -> u16 {
+        return self.ns_count.as_u16();
+    }
+
+    pub fn ar_count(&self) -> u16 {
+        return self.ar_count.as_u16();
+    }
+
     pub fn rcode(&self) -> RCODE {
         return self.flags.get_rcode();
     }
@@ -56,10 +64,10 @@ impl Header {
    pub fn print(&self) {
        println!("ID: {:#01x}", self.id.as_u16());
        self.flags.print();
-       println!("Question count: {}", self.q_count.as_u16());
-       println!("Resource Records: {}", self.an_count.as_u16());
-       println!("Name Server Records: {}", self.ns_count.as_u16());
-       println!("Additional Records: {}", self.ar_count.as_u16());
+       println!("Question count: {}", self.q_count());
+       println!("Resource Records: {}", self.an_count());
+       println!("Name Server Records: {}", self.ns_count());
+       println!("Additional Records: {}", self.ar_count());
    } 
 
    pub fn to_bytes(&self) -> Vec<u8> {
