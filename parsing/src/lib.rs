@@ -80,7 +80,7 @@ impl Response {
         self.header.print();
         self.question.print();
         for an in self.answers.to_vec().iter() {
-            an.print();
+            an.print(self.get_bytes());
         }
     }
 }

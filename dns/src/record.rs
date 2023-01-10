@@ -1,5 +1,6 @@
 use std::net::{Ipv4Addr, Ipv6Addr};
 use utility::{Row, Blob};
+use crate::name::Name;
 
 /*
  *
@@ -180,6 +181,26 @@ impl AAAARecord {
 
     pub fn print(&self) {
         println!("IPv6: {}", self.as_ipv6());
+    }
+}
+
+pub struct CNAMERecord {
+    name: Name,
+}
+
+
+impl CNAMERecord {
+
+    pub fn from_bytes(data: Vec<u8>, src: Vec<u8>, offset: u8) -> Self {
+        let mut name = Name::from_bytes(data.to_vec(), offset);
+        if name.is_compressed() {
+            name = name.decompress(src.to_vec()).unwrap();
+        }
+        return Self{name};
+    }
+
+    pub fn print(&self) {
+       println!("Name: {}", self.name.get_string().unwrap());
     }
 }
 
