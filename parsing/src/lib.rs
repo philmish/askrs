@@ -51,8 +51,9 @@ impl Response {
             return Err("Error response recieved".to_string());
         }
         let offset: u8 = 12 + question.length();
-        if resp_header.an_count() > 0 {
-            let answers = parser.parse_answers(data.to_vec(), offset, resp_header.an_count() as usize)
+        let record_count: usize = resp_header.an_count() as usize + resp_header.ns_count() as usize;
+        if record_count > 0 {
+            let answers = parser.parse_answers(data.to_vec(), offset, record_count)
                                 .unwrap();
             let resp: Response = Response { 
                 bytes: data.to_vec(), 
