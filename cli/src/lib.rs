@@ -25,7 +25,11 @@ struct Flags {
 
     /// Recursive Query
     #[clap(short = 'r', long = "recursion_desired", action = ArgAction::SetTrue)]
-    rd: bool
+    rd: bool,
+
+    /// Verbose Output
+    #[clap(short = 'v', long = "verbose", action = ArgAction::SetTrue)]
+    verbose: bool,
 }
 
 pub struct CLI {
@@ -44,15 +48,14 @@ impl CLI {
         };
     }
 
-    fn send_query(&self, q: Query, srv: socket::DNSSocket) -> Vec<u8> {
+    fn send_query(&self, q: Query, srv: socket::DNSSocket, verbose: bool) -> Vec<u8> {
         let client = socket::UDPClient{};
         let msg = q.to_bytes();
-        let a = client.send_and_recieve(
-            msg,
-            srv
-            )
-            .unwrap();
-        q.print();
+        let a = client.send_and_recieve(msg, srv)
+                      .unwrap();
+        if verbose {
+            q.print(verbose);
+        }
         return a;
     }
 
@@ -61,10 +64,13 @@ impl CLI {
             self.flags.uri.clone(),
             self.flags.record.clone(),
             self.flags.rd.clone(),
-            );
-        let a = self.send_query(q, socket::DNSSocket::from_string(&self.flags.server));
-        println!("----------------------");
+        );
+        let a = self.send_query(
+            q,
+            socket::DNSSocket::from_string(&self.flags.server),
+            self.flags.verbose
+        );
         let resp = Response::from_bytes(a, Parser{}).unwrap();
-        resp.print();
+        resp.print(self.flags.verbose);
     }
 }

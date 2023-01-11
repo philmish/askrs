@@ -76,10 +76,12 @@ impl Question {
         return res;
     }
 
-    pub fn print(&self) {
+    pub fn print(&self, verbose: bool) {
         println!("Domain: {}", self.q_name.get_string().unwrap());
         println!("Question Type: {}", self.q_type.to_string());
-        println!("Question Class: {}", self.q_class.to_string());
+        if verbose {
+            println!("Question Class: {}", self.q_class.to_string());
+        }
     }
 
     pub fn length(&self) -> u8 {

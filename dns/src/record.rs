@@ -132,7 +132,7 @@ impl ARecord {
     }
 
     pub fn print(&self) {
-        println!("IPv4: {}", self.as_ipv4());
+        println!("\tIPv4: {}", self.as_ipv4());
     }
 }
 
@@ -180,7 +180,7 @@ impl AAAARecord {
     }
 
     pub fn print(&self) {
-        println!("IPv6: {}", self.as_ipv6());
+        println!("\tIPv6: {}", self.as_ipv6());
     }
 }
 
@@ -200,7 +200,7 @@ impl CNAMERecord {
     }
 
     pub fn print(&self) {
-       println!("Name: {}", self.name.get_string().unwrap());
+       println!("\tName: {}", self.name.get_string().unwrap());
     }
 }
 
@@ -226,8 +226,8 @@ impl MXRecord {
     }
 
     pub fn print(&self) {
-        println!("Preference: {}", self.preference);
-        println!("{}", self.exchange.get_string().unwrap());
+        println!("\tPreference: {}", self.preference);
+        println!("\tExchange: {}", self.exchange.get_string().unwrap());
     }
 }
 
@@ -245,7 +245,7 @@ impl NSRecord {
     }
 
     pub fn print(&self) {
-        println!("Nameserver: {}", self.nsdname.get_string().unwrap());
+        println!("\tNameserver: {}", self.nsdname.get_string().unwrap());
     }
 }
 

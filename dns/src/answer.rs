@@ -28,7 +28,6 @@ impl Clone for Answer {
 
 impl Answer {
 
-
     fn ttl_as_u32(&self) -> u32 {
         ((self.ttl[0] as u32) << 24) +
         ((self.ttl[1] as u32) << 16) +
@@ -41,19 +40,21 @@ impl Answer {
     }
     
     pub fn print(&self, src: Vec<u8>) {
-        println!("Name: {}", self.name.get_string().unwrap());
-        println!("Type: {}", self.r_type.to_string());
-        println!("Class: {}", self.class.as_u16());
-        println!("TTL: {}", self.ttl_as_u32());
-        println!("Length: {}", self.length.as_u16());
+        println!("---------------------");
+        println!("\tName: {}", self.name.get_string().unwrap());
+        println!("\tType: {}", self.r_type.to_string());
+        println!("\tClass: {}", self.class.as_u16());
+        println!("\tTTL: {}", self.ttl_as_u32());
+        println!("\tLength: {}", self.length.as_u16());
         match self.r_type.to_string().as_str() {
             "A" => ARecord::from_bytes(self.a_data.to_vec(), 0).print(),
             "AAAA" => AAAARecord::from_bytes(self.a_data.to_vec(), 0).print(),
             "CNAME" => CNAMERecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
             "MX" => MXRecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
             "NS" => NSRecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
-            _ => println!("unparseable answer data.")
+            _ => println!("\tunparseable answer data.")
         };
+        println!("---------------------");
     }
 
     pub fn from_bytes(data: Vec<u8>, offset: u8) -> Result<Self, String> {

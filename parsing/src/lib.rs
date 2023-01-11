@@ -28,9 +28,9 @@ impl Query {
         return res;
     }
 
-    pub fn print(&self) {
-        self.header.print();
-        self.question.print();
+    pub fn print(&self, verbose: bool) {
+        self.header.print(verbose);
+        self.question.print(verbose);
     }
 }
 
@@ -77,9 +77,12 @@ impl Response {
         return self.bytes.to_vec();
     }
 
-    pub fn print(&self) {
-        self.header.print();
-        self.question.print();
+    pub fn print(&self, verbose: bool) {
+        self.header.print(verbose);
+        self.question.print(verbose);
+        println!("Answer Records: {}", self.header.an_count());
+        println!("NS Records: {}", self.header.ns_count());
+        println!("Additional Records: {}", self.header.ar_count());
         for an in self.answers.to_vec().iter() {
             an.print(self.get_bytes());
         }
