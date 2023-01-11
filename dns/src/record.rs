@@ -28,7 +28,6 @@ MAILA           254 A request for mail agent RRs (Obsolete - see MX)
 *               255 A request for all records
 *
 */
-//TODO implement NS Records
 
 pub enum RecordType {
     A,
