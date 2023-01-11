@@ -37,7 +37,7 @@ OPTIONS:
     -u, --uri <URI>            Target adress or domain to request records for
     -V, --version              Print version information
 EXAMPLE:
-    cargo run -- -u google -s cloudflare --record NS -r
+    cargo run -- -u google.com -s cloudflare --record NS -r
 ```
 
 ## Roadmap
@@ -45,6 +45,7 @@ EXAMPLE:
 To continue learning about rust and improve the code base I am thinking about the following upcoming changes:
 
 1. Imporve Output formatting, add a CLI flag for verbosity
-2. Refactoring data parsing for better performance
-3. Implementing persisting / caching response data with files (i.e JSON) or with SQLite
-4. Taking a look into async Websockets with [tokio](https://tokio.rs/) to make multiple requests efficiently
+2. Implementing Inverse DNS Queries
+3. Refactoring data parsing for better performance
+4. Implementing persisting / caching response data with files (i.e JSON) or with SQLite
+5. Taking a look into async Websockets with [tokio](https://tokio.rs/) to make multiple requests efficiently
