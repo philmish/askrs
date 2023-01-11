@@ -10,9 +10,9 @@ askrs is a CLI tool to perform basic DNS lookups over a UDP socket connection fo
 
 As source DNS Servers the user has the choice between:
 
-- google DNS (8.8.8.8)
-- cloudfalre DNS (1.1.1.1)
-- quad 9 DNS (9.9.9.9)
+- google (8.8.8.8)
+- cloudflare (1.1.1.1)
+- quad 9 (9.9.9.9)
 
 This repository serves as a learning-by-doing project for me to get comfortable with rust and network fundamentals. The first goal was to get everything working, so the quality / performance of the code is more than sub-optimal.
 
