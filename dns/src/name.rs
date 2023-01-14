@@ -10,6 +10,15 @@ pub struct Label {
 
 impl Label {
 
+    pub fn new(length: u8, is_compressed: bool, offset: u8, bytes: Vec<u8>) -> Self {
+       return Self{
+           length,
+           is_compressed,
+           offset,
+           bytes,
+       } 
+    }
+
     pub fn from_string(name: String) -> Result<Self, &'static str> {
         let bytes = name.as_bytes().to_vec();
         if bytes.len() > 255 {

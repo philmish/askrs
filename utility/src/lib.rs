@@ -104,7 +104,6 @@ impl Blob for Vec<u8> {
             count += 1;
         }).collect();
         return Ok(res);
-        
     }
 
     fn get_from_offset(&self, start: u8) -> Result<Vec<u8>, &'static str> {

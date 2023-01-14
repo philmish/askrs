@@ -4,6 +4,8 @@ use dns::header::{self, Header};
 use dns::record::RecordType;
 use utility::Blob;
 
+pub mod byte_stream_parser;
+
 pub struct Query {
     header: header::Header,
     question: Question,
