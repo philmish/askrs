@@ -1,4 +1,10 @@
-use dns::{header::Header, name::{Label, Name}, question::{Question, QClass}, record::RecordType, answer::Answer};
+use dns::{
+    header::Header,
+    name::{Label, Name},
+    question::{Question, QClass},
+    record::RecordType,
+    answer::Answer
+};
 use utility::Row;
 
 use crate::Response;
@@ -76,7 +82,7 @@ impl<'slice> ByteStreamParser<'slice> {
     }
     
     pub fn set_stream_to_offset(&mut self, offset: u8) {
-        if offset < self.curr_offset && offset as usize <= self.stream.len() {
+        if offset > self.curr_offset && offset as usize <= self.stream.len() {
             let n: u8 = offset - self.curr_offset;
             let _ = self.pop_n_from_stream(n as usize).unwrap();
         } else {
@@ -156,17 +162,12 @@ impl<'slice> ByteStreamParser<'slice> {
         }
         if labels.len() == 0 {
             return Err("Something went wrong parsing the labels.".to_string());
-        } else {
-            return Ok(Name::new(labels, compressed));
         }
+        let name = Name::new(labels, compressed);
+        return Ok(name);
     }
 
     pub fn take_row(&mut self) -> Result<[u8;2], String> {
-        /*
-        if self.curr_offset % 2 != 0 {
-            return Err("Cant take row while offset is in a mid of row.".to_string());
-        }
-        */
         if self.remaining_stream_len() == 0 {
             self.reset_stream();
         }

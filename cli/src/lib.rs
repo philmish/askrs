@@ -1,7 +1,8 @@
 use clap::Parser as clapParser;
 use clap::ArgAction;
+use dns::record::RecordType;
 use parsing::byte_stream_parser::ByteStreamParser;
-use parsing::{Parser, Query};
+use parsing::Query;
 
 pub mod socket;
 
@@ -35,17 +36,14 @@ struct Flags {
 
 pub struct CLI {
     flags: Flags,
-    parser: Parser,
 }
 
 impl CLI {
 
     pub fn init() -> Self {
         let flags = Flags::parse();
-        let parser = Parser{};
         return Self{
             flags,
-            parser
         };
     }
 
@@ -61,19 +59,18 @@ impl CLI {
     }
 
     pub fn run(&self) {
-        let q = self.parser.new_query(
+        let r: RecordType = RecordType::from_string(self.flags.record.clone());
+        let qry = Query::new(
             self.flags.uri.clone(),
-            self.flags.record.clone(),
+            r,
             self.flags.rd.clone(),
         );
         let a = self.send_query(
-            q,
+            qry,
             socket::DNSSocket::from_string(&self.flags.server),
             self.flags.verbose
         );
         let resp = ByteStreamParser::new(&a).parse_response().unwrap();
-
-        //let resp = Response::from_bytes(a, Parser{}).unwrap();
         resp.print(self.flags.verbose);
     }
 }

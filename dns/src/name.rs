@@ -112,6 +112,15 @@ impl Label {
             return Ok(labels);
         }
     }
+
+    pub fn is_compressed(&self) -> bool {
+        return self.is_compressed
+    }
+
+    pub fn offset(&self) -> u8 {
+        self.offset
+    }
+
 }
 
 pub struct Name {
