@@ -21,6 +21,13 @@ impl QClass {
         };
     }
 
+    pub fn from_row(data: [u8;2]) -> Self {
+        match data.as_u16() {
+            1 => QClass::INET,
+            _ => QClass::INET,
+        }
+    }
+
     pub fn to_string(&self) -> String {
         match self {
             QClass::INET => "INET".to_string(),
@@ -41,6 +48,11 @@ pub struct Question {
 }
 
 impl Question {
+
+    pub fn init(q_name: name::Name, q_type: RecordType, q_class: QClass) -> Self {
+        return Self { q_name, q_type, q_class }
+    }
+
     pub fn new(name: String, q_type: Option<RecordType>, q_class: Option<QClass>) -> Self {
         return Question{
             q_name: name::Name::from_string(name).unwrap(),

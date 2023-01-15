@@ -130,6 +130,10 @@ impl Clone for Name {
 
 impl Name {
 
+    pub fn new(labels: Vec<Label>, compressed: bool) -> Self {
+        return Self { labels, compressed }
+    }
+
     pub fn from_string(name: String) -> Result<Self, &'static str> {
         if !name.is_ascii() {
             return Err("Names can only contain ascii symbols.");

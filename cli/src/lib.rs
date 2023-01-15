@@ -1,6 +1,7 @@
 use clap::Parser as clapParser;
 use clap::ArgAction;
-use parsing::{Parser, Query, Response};
+use parsing::byte_stream_parser::ByteStreamParser;
+use parsing::{Parser, Query};
 
 pub mod socket;
 
@@ -70,7 +71,9 @@ impl CLI {
             socket::DNSSocket::from_string(&self.flags.server),
             self.flags.verbose
         );
-        let resp = Response::from_bytes(a, Parser{}).unwrap();
+        let resp = ByteStreamParser::new(&a).parse_response().unwrap();
+
+        //let resp = Response::from_bytes(a, Parser{}).unwrap();
         resp.print(self.flags.verbose);
     }
 }

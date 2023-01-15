@@ -45,6 +45,10 @@ pub struct Response {
 
 impl Response {
 
+    pub fn new(bytes: Vec<u8>, header: Header, question: Question, answers: Vec<Answer>) -> Self {
+        return Self { bytes, header, question, answers }
+    }
+
     pub fn from_bytes(data: Vec<u8>, parser: Parser) -> Result<Self, String> {
         let resp_header = parser.parse_header(data.to_vec());
         let question = parser.parse_question(data.to_vec()).unwrap();

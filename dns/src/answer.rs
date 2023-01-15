@@ -2,6 +2,30 @@ use utility::{Row, Blob};
 
 use crate::{name::Name, record::{RecordType, ARecord, AAAARecord, CNAMERecord, MXRecord, NSRecord}};
 
+/*
+                               1  1  1  1  1  1
+      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                                               |
+    /                                               /
+    /                      NAME                     /
+    |                                               |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                      TYPE                     |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                     CLASS                     |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                      TTL                      |
+    |                                               |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |                   RDLENGTH                    |
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--|
+    /                     RDATA                     /
+    /                                               /
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ 
+
+*/
+
 //TODO make length a u16 and ttl a u32 as they are used as such
 //TODO find a way to use generics and traits for a_data field
 pub struct Answer {
@@ -27,6 +51,12 @@ impl Clone for Answer {
 }
 
 impl Answer {
+
+    pub fn new(name: Name, r_type: RecordType, class: [u8;2], ttl: [u8;4], length: [u8;2], a_data: Vec<u8>) -> Self {
+        return Self{
+            name, r_type, class, ttl, length, a_data,
+        }
+    }
 
     fn ttl_as_u32(&self) -> u32 {
         ((self.ttl[0] as u32) << 24) +
