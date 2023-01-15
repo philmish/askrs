@@ -1,5 +1,7 @@
 # askrs - DNS lookup tool
 
+![Tests](https://github.com/philmish/askrs/workflows/rust.yml/badge.svg)
+
 askrs is a CLI tool to perform basic DNS lookups over a UDP socket connection for:
 
 - A Records
@@ -40,10 +42,73 @@ EXAMPLE:
     cargo run -- -u google.com -s cloudflare --record NS -r
 ```
 
+## Example
+
+### Command
+```
+cargo run -- -u microsoft.com -s cloudflare --record A -r
+```
+
+### Printed Result
+```
+Socket bound to local address 0.0.0.0:0
+ID: 0xc0af
+Question count: 1
+Resource Records: 5
+Name Server Records: 0
+Additional Records: 0
+Domain: microsoft.com
+Question Type: A
+Answer Records: 5
+NS Records: 0
+Additional Records: 0
+---------------------
+	Name: microsoft.com
+	Type: A
+	Class: 1
+	TTL: 1552
+	Length: 4
+	IPv4: 20.53.203.50
+---------------------
+---------------------
+	Name: microsoft.com
+	Type: A
+	Class: 1
+	TTL: 1552
+	Length: 4
+	IPv4: 20.81.111.85
+---------------------
+---------------------
+	Name: microsoft.com
+	Type: A
+	Class: 1
+	TTL: 1552
+	Length: 4
+	IPv4: 20.84.181.62
+---------------------
+---------------------
+	Name: microsoft.com
+	Type: A
+	Class: 1
+	TTL: 1552
+	Length: 4
+	IPv4: 20.103.85.33
+---------------------
+---------------------
+	Name: microsoft.com
+	Type: A
+	Class: 1
+	TTL: 1552
+	Length: 4
+	IPv4: 20.112.52.29
+---------------------
+```
+
 ## Roadmap
 
 To continue learning about rust and improve the code base I am thinking about the following upcoming changes:
 
-1. Implementing Inverse DNS Queries
-2. Implementing persisting / caching response data with files (i.e JSON) or with SQLite
-3. Taking a look into async Websockets with [tokio](https://tokio.rs/) to make multiple requests efficiently
+1. Implement Inverse DNS Queries
+2. Implement persisting / caching response data with files (i.e JSON) or with SQLite
+3. Refactor the DNS servers to have secondary IPs
+4. Take a look into async Websockets with [tokio](https://tokio.rs/) to make multiple requests efficiently
