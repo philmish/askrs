@@ -3,6 +3,7 @@ use clap::ArgAction;
 use dns::record::RecordType;
 use parsing::byte_stream_parser::ByteStreamParser;
 use parsing::Query;
+use socket::DNSSocket;
 
 pub mod socket;
 
@@ -34,6 +35,17 @@ struct Flags {
     verbose: bool,
 }
 
+impl Flags {
+
+    pub fn get_rtype(&self) -> RecordType {
+        return RecordType::from_string(self.record.clone())
+    }
+
+    pub fn get_server(&self) -> DNSSocket {
+        return DNSSocket::from_string(&self.server);
+    }
+}
+
 pub struct CLI {
     flags: Flags,
 }
@@ -47,7 +59,7 @@ impl CLI {
         };
     }
 
-    fn send_query(&self, q: Query, srv: socket::DNSSocket, verbose: bool) -> Vec<u8> {
+    fn send_query(&self, q: Query, srv: DNSSocket, verbose: bool) -> Vec<u8> {
         let client = socket::UDPClient{};
         let msg = q.to_bytes();
         let a = client.send_and_recieve(msg, srv)
@@ -59,15 +71,14 @@ impl CLI {
     }
 
     pub fn run(&self) {
-        let r: RecordType = RecordType::from_string(self.flags.record.clone());
         let qry = Query::new(
             self.flags.uri.clone(),
-            r,
+            self.flags.get_rtype(),
             self.flags.rd.clone(),
         );
         let a = self.send_query(
             qry,
-            socket::DNSSocket::from_string(&self.flags.server),
+            self.flags.get_server(),
             self.flags.verbose
         );
         let resp = ByteStreamParser::new(&a).parse_response().unwrap();

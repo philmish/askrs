@@ -1,4 +1,4 @@
-use utility::{Row, Blob};
+use utility::Row;
 
 use crate::{name, record::RecordType};
 
@@ -59,25 +59,6 @@ impl Question {
             q_type: q_type.unwrap_or(RecordType::A),
             q_class: q_class.unwrap_or(QClass::INET),
         };
-    }
-
-    pub fn from_bytes(data: Vec<u8>) -> Result<Self, &'static str> {
-       let mut name = name::Name::from_bytes(data.to_vec(), 0) ;
-       if name.is_compressed() {
-           name = name.decompress(data.to_vec()).unwrap();
-       }
-       let data = data.get_from_offset(name.get_bytes_length()).unwrap();
-       if data.len() < 4 {
-           return Err("Question must end with at least 4 bytes.");
-       }
-       let q_type: [u8;2] = [data[0], data[1]];
-       let q_class: QClass = QClass::from_bytes(vec![data[2], data[3]]);
-       return Ok(
-           Question {
-               q_name: name,
-               q_type: RecordType::from_bytes(q_type),
-               q_class 
-           });
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {

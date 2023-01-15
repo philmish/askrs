@@ -111,7 +111,9 @@ pub struct ARecord {
 impl ARecord {
     
     pub fn from_bytes(data: Vec<u8>, offset: u8) -> Self {
-        let bytes: Vec<u8> = data.to_vec().get_from_offset(offset).unwrap();
+        let bytes: Vec<u8> = data.to_vec()
+                                 .get_from_offset(offset)
+                                 .unwrap();
         let mut pos = 0;
         let mut fields: [u8;4];
         let mut i = bytes.into_iter();
@@ -127,7 +129,12 @@ impl ARecord {
     }
 
     pub fn as_ipv4(&self) -> Ipv4Addr {
-        return Ipv4Addr::new(self.fields[0], self.fields[1], self.fields[2], self.fields[3]);
+        return Ipv4Addr::new(
+            self.fields[0],
+            self.fields[1],
+            self.fields[2],
+            self.fields[3]
+        );
     }
 
     pub fn print(&self) {
@@ -255,7 +262,12 @@ mod tests {
 
     #[test]
     fn test_aaaa_record() {
-        let data: Vec<u8> = vec![244, 144, 131, 10, 253, 198, 107, 97, 126, 155, 106, 122, 200, 157, 89, 237];
+        let data: Vec<u8> = vec![
+            244, 144, 131, 10,
+            253, 198, 107, 97,
+            126, 155, 106, 122,
+            200, 157, 89, 237
+        ];
         let record = AAAARecord::from_bytes(data.to_vec(), 0);
         record.print();
     }
