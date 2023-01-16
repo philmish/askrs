@@ -1,3 +1,5 @@
+use std::fmt;
+
 use utility::{Row, Byte};
 
 /*
@@ -89,6 +91,17 @@ pub enum OPCODE {
     UNKNOWN,
 }
 
+impl fmt::Display for OPCODE {
+   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            OPCODE::QUERY => write!(f, "OPCODE: Query"),
+            OPCODE::IQUERY => write!(f, "OPCODE: Inverse Query"),
+            OPCODE::STATUS => write!(f,"OPCODE: Server Status"),
+            OPCODE::UNKNOWN => write!(f, "OPCODE: Unknown"),
+        }
+   } 
+}
+
 impl OPCODE {
 
     pub fn from_byte(byte: u8) -> Self {
@@ -109,12 +122,7 @@ impl OPCODE {
     }
 
     pub fn print(&self) {
-        match self {
-            OPCODE::QUERY => println!("OPCODE: Query"),
-            OPCODE::IQUERY => println!("OPCODE: Inverse Query"),
-            OPCODE::STATUS => println!("OPCODE: Server Status"),
-            OPCODE::UNKNOWN => println!("OPCODE: Unknown"),
-        }
+        println!("{}", self)
     }
 }
 
@@ -126,6 +134,42 @@ pub enum RCODE {
     NOTIMPL,
     REFUSED,
     UNKNOWN,
+}
+
+impl fmt::Display for RCODE {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            RCODE::NOERR => write!(
+                f,
+                "No Errors encountered."
+            ),
+            RCODE::FMTERR => write!(
+                f,
+                "The Name Server was unable to interpret the query."
+            ),
+            RCODE::SRVFAIL => write!(
+                f,
+                "The Name Server was unable to process this query due to a problem with the name server."
+            ),
+            RCODE::NAMEERR => write!(
+                f, 
+                "Meaningful only for responses from an authoritative name server, this code signifies that the domain name referenced in the query does not exist."
+            ),
+            RCODE::NOTIMPL => write!(
+                f, 
+                "The name server does not support the requested kind of query."
+            ),
+            RCODE::REFUSED => write!(
+                f,
+                "The name server refuses to perform the specified operation for policy reasons.  For example, a name server may not wish to provide the information to the particular requester, or a name server may not wish to perform a particular operation (e.g., zone"
+            ),
+            RCODE::UNKNOWN => write!(
+                f,
+                "An unknown error code was encountered. Check your parsing."
+            )
+        }
+        
+    }
 }
 
 impl RCODE {
@@ -157,20 +201,23 @@ impl RCODE {
     }
 
     pub fn print(&self) {
-        match self {
-            RCODE::NOERR => println!("No Errors encountered."),
-            RCODE::FMTERR => println!("The Name Server was unable to interpret the query."),
-            RCODE::SRVFAIL => println!("The Name Server was unable to process this query due to a problem with the name server."),
-            RCODE::NAMEERR => println!("Meaningful only for responses from an authoritative name server, this code signifies that the domain name referenced in the query does not exist."),
-            RCODE::NOTIMPL => println!("The name server does not support the requested kind of query."),
-            RCODE::REFUSED => println!("The name server refuses to perform the specified operation for policy reasons.  For example, a name server may not wish to provide the information to the particular requester, or a name server may not wish to perform a particular operation (e.g., zone"),
-            RCODE::UNKNOWN => println!("An unknown error code was encountered. Check your parsing.")
-        }
+        println!("{}", self)
     }
 }
 
 pub struct Flags {
     bytes: [u8;2],
+}
+
+impl fmt::Display for Flags {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let aa = if self.is_aa() {"Authoritative Answer: True"} else {"Authoritative Answer: False"};
+        let rd = if self.is_recursion_desired() {"Recursive: True"} else {"Recursive: False"};
+        let ra = if self.is_recursion_available() {"Recursion Available: True"} else {"Recursion Available: False"};
+        let op = self.get_opcode();
+        let rcode = self.get_rcode();
+       write!(f, "{}\n{}\n{}\n{}\n{}", op, aa, rd, ra, rcode) 
+    }
 }
 
 impl Flags {
@@ -205,6 +252,10 @@ impl Flags {
         return RCODE::from_byte(self.bytes[1]);
     }
 
+    fn get_opcode(&self) -> OPCODE {
+        return OPCODE::from_byte(self.bytes[0])
+    }
+
     pub fn is_aa(&self) -> bool {
         return self.bytes[0].bit_is_set(2);
     }
@@ -222,13 +273,6 @@ impl Flags {
     }
 
     pub fn print(&self) {
-        let aa = if self.is_aa() {"Authoritative Answer: True"} else {"Authoritative Answer: False"};
-        let rd = if self.is_recursion_desired() {"Recursive: True"} else {"Recursive: False"};
-        let ra = if self.is_recursion_available() {"Recursion Available: True"} else {"Recursion Available: False"};
-        OPCODE::from_byte(self.bytes[0]).print();
-        println!("{}", aa);
-        println!("{}", rd);
-        println!("{}", ra);
-        self.get_rcode().print()
+        println!("{}", self)
     }
 }

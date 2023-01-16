@@ -108,7 +108,8 @@ Additional Records: 0
 
 To continue learning about rust and improve the code base I am thinking about the following upcoming changes:
 
-1. Implement Inverse DNS Queries
-2. Implement persisting / caching response data with files (i.e JSON) or with SQLite
-3. Refactor the DNS servers to have secondary IPs
-4. Take a look into async Websockets with [tokio](https://tokio.rs/) to make multiple requests efficiently
+1. Fix bug for decompression of names with many levels of compression
+2. Implement Inverse DNS Queries
+3. Implement persisting / caching response data with files (i.e JSON) or with SQLite
+4. Refactor the DNS servers to have secondary IPs
+5. Take a look into async Websockets with [tokio](https://tokio.rs/) to make multiple requests efficiently

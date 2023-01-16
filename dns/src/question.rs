@@ -1,3 +1,5 @@
+use std::fmt;
+
 use utility::Row;
 
 use crate::{name, record::RecordType};
@@ -47,6 +49,18 @@ pub struct Question {
     q_class: QClass,
 }
 
+impl fmt::Display for Question {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+       write!(
+           f,
+           "URI: {}\nQType: {}\nQClass: {}",
+           self.q_name.get_string().unwrap(),
+           self.q_type.to_string(),
+           self.q_class.to_string()
+        )
+    }
+}
+
 impl Question {
 
     pub fn init(q_name: name::Name, q_type: RecordType, q_class: QClass) -> Self {
@@ -69,12 +83,8 @@ impl Question {
         return res;
     }
 
-    pub fn print(&self, verbose: bool) {
-        println!("Domain: {}", self.q_name.get_string().unwrap());
-        println!("Question Type: {}", self.q_type.to_string());
-        if verbose {
-            println!("Question Class: {}", self.q_class.to_string());
-        }
+    pub fn print(&self) {
+        println!("{}", self)
     }
 
     pub fn length(&self) -> u8 {

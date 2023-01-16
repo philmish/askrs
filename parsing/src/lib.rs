@@ -30,8 +30,10 @@ impl Query {
     }
 
     pub fn print(&self, verbose: bool) {
-        self.header.print(verbose);
-        self.question.print(verbose);
+        if verbose {
+            self.header.print();
+            self.question.print();
+        }
     }
 }
 
@@ -53,8 +55,10 @@ impl Response {
     }
 
     pub fn print(&self, verbose: bool) {
-        self.header.print(verbose);
-        self.question.print(verbose);
+        if verbose {
+            self.header.print();
+        }
+        self.question.print();
         println!("Answer Records: {}", self.header.an_count());
         println!("NS Records: {}", self.header.ns_count());
         println!("Additional Records: {}", self.header.ar_count());

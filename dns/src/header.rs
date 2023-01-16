@@ -61,11 +61,9 @@ impl Header {
         };
     }
 
-   pub fn print(&self, verbose: bool) {
+   pub fn print(&self) {
        println!("ID: {:#01x}", self.id.as_u16());
-       if verbose {
-           self.flags.print();
-       }
+       self.flags.print();
        println!("Question count: {}", self.q_count());
        println!("Resource Records: {}", self.an_count());
        println!("Name Server Records: {}", self.ns_count());
