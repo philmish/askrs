@@ -31,7 +31,7 @@ impl Query {
 
     pub fn print(&self, verbose: bool) {
         if verbose {
-            self.header.print();
+            println!("{}", self.header);
             self.question.print();
         }
     }
@@ -56,7 +56,7 @@ impl Response {
 
     pub fn print(&self, verbose: bool) {
         if verbose {
-            self.header.print();
+            println!("{}", self.header)
         }
         self.question.print();
         println!("Answer Records: {}", self.header.an_count());

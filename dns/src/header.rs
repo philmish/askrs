@@ -1,3 +1,5 @@
+use std::fmt;
+
 use utility::{Row,Blob};
 
 use crate::header_flags::Flags;
@@ -11,6 +13,21 @@ pub struct Header {
     an_count: [u8;2],
     ns_count: [u8;2],
     ar_count: [u8;2],
+}
+
+impl fmt::Display for Header {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "ID: {}\n{}\nQuestion count: {}\nResource Records: {}\nName Server Records: {}\nAdditional: {}",
+            self.id.as_u16(),
+            self.flags,
+            self.q_count(),
+            self.an_count(),
+            self.ns_count(),
+            self.ar_count(),
+        )
+    }
 }
 
 impl Header {
@@ -60,15 +77,6 @@ impl Header {
             ar_count: data[10..12].try_into().unwrap(),
         };
     }
-
-   pub fn print(&self) {
-       println!("ID: {:#01x}", self.id.as_u16());
-       self.flags.print();
-       println!("Question count: {}", self.q_count());
-       println!("Resource Records: {}", self.an_count());
-       println!("Name Server Records: {}", self.ns_count());
-       println!("Additional Records: {}", self.ar_count());
-   } 
 
    pub fn to_bytes(&self) -> Vec<u8> {
       let mut res: Vec<u8> = vec![];
