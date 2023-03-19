@@ -27,7 +27,6 @@ use crate::{name::Name, record::{RecordType, ARecord, AAAARecord, CNAMERecord, M
 */
 
 //TODO make length a u16 and ttl a u32 as they are used as such
-//TODO find a way to use generics and traits for a_data field
 pub struct Answer {
     name: Name,
     r_type: RecordType,

@@ -51,16 +51,6 @@ impl Clone for RecordType {
 
 impl RecordType {
 
-    pub fn as_bytes(r_type: RecordType) -> [u8;2] {
-        match r_type {
-            RecordType::A => [0b0000_0000, 0b0000_0001],
-            RecordType::AAAA => [0b0000_0000, 0b0001_1100],
-            RecordType::CNAME => [0b0000_0000, 0b0000_0101],
-            RecordType::NS => [0b0000_0000, 0b0000_0010],
-            RecordType::MX => [0b0000_0000, 0b0000_1111],
-        }
-    }
-
     pub fn from_string(r_type: String) -> Self {
         match r_type.as_str() {
             "A" => RecordType::A,
@@ -115,12 +105,11 @@ impl ARecord {
                                  .get_from_offset(offset)
                                  .unwrap();
         let mut pos = 0;
-        let mut fields: [u8;4];
+        let mut fields: [u8;4] = [0;4];
         let mut i = bytes.into_iter();
         if i.len() < 4  {
             panic!("Parsing A Record from iterator with len {}", i.len());
         }
-        fields = [0,0,0,0];
         while pos < 4 {
             fields[pos] = i.next().unwrap();
             pos += 1;
@@ -151,12 +140,11 @@ impl AAAARecord {
     pub fn from_bytes(data: Vec<u8>, offset: u8) -> Self {
         let bytes = data.to_vec().get_from_offset(offset).unwrap();
         let mut pos: usize = 0;
-        let mut buf: [u8;16];
+        let mut buf: [u8;16] = [0;16];
         let mut iter = bytes.into_iter();
         if iter.len() < 16 {
             panic!("Trying to parse AAAA record from byte vector of length {}", iter.len());
         }
-        buf = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
         while pos < 16 {
             buf[pos] = iter.next().unwrap();
             pos += 1;
@@ -165,7 +153,7 @@ impl AAAARecord {
     }
 
     pub fn as_ipv6(&self) -> Ipv6Addr {
-        let mut fields: [u16;8] = [0,0,0,0,0,0,0,0];
+        let mut fields: [u16;8] = [0;8];
         let mut pos: usize = 0;
         let mut buf: [u8;2];
         for el in self.bytes.chunks(2) {
@@ -258,7 +246,7 @@ impl NSRecord {
 #[cfg(test)]
 mod tests {
 
-    use super::AAAARecord;
+    use super::*;
 
     #[test]
     fn test_aaaa_record() {
@@ -270,5 +258,51 @@ mod tests {
         ];
         let record = AAAARecord::from_bytes(data.to_vec(), 0);
         record.print();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_aaaa_to_few_bytes() {
+        let data: Vec<u8> = vec![
+            244, 144, 131, 10,
+            253, 198, 107, 97,
+            126, 155, 106, 122,
+        ];
+        let _record = AAAARecord::from_bytes(data.to_vec(), 0);
+        
+    }
+
+    #[test]
+    fn test_record_type_from_bytes() {
+
+        assert!(matches!(RecordType::from_bytes([0,1]), RecordType::A));
+        assert!(matches!(RecordType::from_bytes([0,2]), RecordType::NS));
+        assert!(matches!(RecordType::from_bytes([0,5]), RecordType::CNAME));
+        assert!(matches!(RecordType::from_bytes([0,28]), RecordType::AAAA));
+        assert!(matches!(RecordType::from_bytes([0,15]), RecordType::MX));
+        assert!(matches!(RecordType::from_bytes([0,245]), RecordType::A));
+        
+    }
+
+    #[test]
+    fn test_record_type_to_string() {
+        
+            assert_eq!(RecordType::A.to_string(), "A".to_string());
+            assert_eq!(RecordType::AAAA.to_string(), "AAAA".to_string());
+            assert_eq!(RecordType::CNAME.to_string(), "CNAME".to_string());
+            assert_eq!(RecordType::MX.to_string(), "MX".to_string());
+            assert_eq!(RecordType::NS.to_string(), "NS".to_string());
+
+    }
+
+    #[test]
+    fn test_record_type_from_string() {
+
+       assert!(matches!(RecordType::from_string("A".to_string()), RecordType::A));
+       assert!(matches!(RecordType::from_string("AAAA".to_string()), RecordType::AAAA));
+       assert!(matches!(RecordType::from_string("CNAME".to_string()), RecordType::CNAME));
+       assert!(matches!(RecordType::from_string("MX".to_string()), RecordType::MX));
+       assert!(matches!(RecordType::from_string("NS".to_string()), RecordType::NS));
+
     }
 }

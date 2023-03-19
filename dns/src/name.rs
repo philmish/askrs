@@ -223,7 +223,6 @@ impl Name {
             if i.is_compressed {
                 let decompressed_labels = i.decompress(data.to_vec()).unwrap();
                 labels.extend(decompressed_labels);
-                //break;
                 continue;
             } else {
                 labels.push(i);
