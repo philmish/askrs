@@ -56,7 +56,7 @@ impl UDPClient {
         let _send_bytes = socket.send(&msg_bytes).expect("Failed to send message over socket.");
         let length: usize = match socket.recv(&mut buf) {
             Ok(recieved) => recieved,
-            Err(_e) => 0,
+            Err(_) => 0,
         };
 
         if length == 0 {
