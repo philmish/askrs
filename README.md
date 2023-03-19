@@ -1,6 +1,7 @@
 # askrs - DNS lookup tool
 
 ![Tests](https://github.com/philmish/askrs/actions/workflows/rust.yml/badge.svg)
+[![codecov](https://codecov.io/gh/philmish/askrs/branch/master/graph/badge.svg)](https://codecov.io/gh/philmish/askrs)
 
 askrs is a CLI tool to perform basic DNS lookups over a UDP socket connection for:
 
