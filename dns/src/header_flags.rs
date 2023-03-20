@@ -121,9 +121,6 @@ impl OPCODE {
         }
     }
 
-    pub fn print(&self) {
-        println!("{}", self)
-    }
 }
 
 pub enum RCODE {
@@ -274,5 +271,38 @@ impl Flags {
 
     pub fn print(&self) {
         println!("{}", self)
+    }
+}
+
+#[cfg(test)]
+mod test {
+
+    use super::*;
+
+
+    #[test]
+    fn test_r_code_from_bytes() {
+
+        assert!(matches!(RCODE::from_byte(0), RCODE::NOERR));
+        assert!(matches!(RCODE::from_byte(1), RCODE::FMTERR));
+        assert!(matches!(RCODE::from_byte(2), RCODE::SRVFAIL));
+        assert!(matches!(RCODE::from_byte(3), RCODE::NAMEERR));
+        assert!(matches!(RCODE::from_byte(4), RCODE::NOTIMPL));
+        assert!(matches!(RCODE::from_byte(5), RCODE::REFUSED));
+        assert!(matches!(RCODE::from_byte(6), RCODE::UNKNOWN));
+
+    }
+
+    #[test]
+    fn test_r_code_is_err() {
+
+        assert_eq!(false, RCODE::NOERR.is_err());
+        assert!(RCODE::FMTERR.is_err());
+        assert!(RCODE::SRVFAIL.is_err());
+        assert!(RCODE::NAMEERR.is_err());
+        assert!( RCODE::NOTIMPL.is_err());
+        assert!( RCODE::REFUSED.is_err());
+        assert!(RCODE::UNKNOWN.is_err());
+
     }
 }
