@@ -1,8 +1,11 @@
 [workspace]
 
+resolver = "3"
+
 members = [
     "cli",
     "parsing",
     "dns",
     "utility",
+    "askrs"
 ]
