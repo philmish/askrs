@@ -1,6 +1,6 @@
 use dns::answer::Answer;
-use dns::question::Question;
 use dns::header::{self, Header};
+use dns::question::Question;
 use dns::record::RecordType;
 
 pub mod byte_stream_parser;
@@ -11,14 +11,10 @@ pub struct Query {
 }
 
 impl Query {
-
     pub fn new(domain: String, r_type: RecordType, rd: bool) -> Self {
         let header = Header::new_query(Some(rd));
         let question = Question::new(domain, Some(r_type), None);
-        return Self{
-            header,
-            question
-        };
+        return Self { header, question };
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
@@ -45,9 +41,13 @@ pub struct Response {
 }
 
 impl Response {
-
     pub fn new(bytes: Vec<u8>, header: Header, question: Question, answers: Vec<Answer>) -> Self {
-        return Self { bytes, header, question, answers }
+        return Self {
+            bytes,
+            header,
+            question,
+            answers,
+        };
     }
 
     pub fn get_bytes(&self) -> Vec<u8> {
