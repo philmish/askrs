@@ -1,5 +1,7 @@
 use crate::bits::HasBits;
 
+pub(crate) mod label;
+
 #[derive(Clone, Copy)]
 pub(crate) struct Row(u8, u8);
 
@@ -47,58 +49,9 @@ impl Row {
     }
 }
 
-pub(crate) struct Label {
-    length: usize,
-    content: [u8; 63],
-}
-
-impl Label {
-    pub(crate) fn zero_label() -> Self {
-        Label {
-            length: 0,
-            content: [0u8; 63],
-        }
-    }
-
-    pub(crate) fn encode(&self) -> Vec<u8> {
-        if self.length == 0 {
-            return vec![0];
-        }
-        let mut buf: Vec<u8> = Vec::with_capacity(self.length + 1);
-        buf.push(self.length as u8);
-        for b in self.content.iter() {
-            buf.push(b.clone());
-        }
-        return buf;
-    }
-}
-
-impl TryFrom<String> for Label {
-    type Error = String;
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        match value.as_str() {
-            "" => Ok(Label::zero_label()),
-            _ => {
-                if !value.is_ascii() {
-                    return Err(String::from("Label must only contain ascii symbols"));
-                }
-                let len = value.bytes().len();
-                let mut buf = [0u8; 63];
-                for (i, ch) in value.chars().enumerate().take(63) {
-                    buf[i] = ch as u8
-                }
-                return Ok(Label {
-                    length: len,
-                    content: buf,
-                });
-            }
-        }
-    }
-}
-
-pub(crate) struct Name(Vec<Label>);
+pub(crate) struct Name(Vec<label::Label>);
 
 // TODO: Research if Btreemap or HashMap is more useful here.
 //       This will be used to resolve compressed names from a response.
 //       It will be used to map labels to offsets.
-// pub(crate) struct LabelMap();
+// pub(crate) struct La{belMap();
