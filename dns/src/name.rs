@@ -9,14 +9,13 @@ pub struct Label {
 }
 
 impl Label {
-
     pub fn new(length: u8, is_compressed: bool, offset: u8, bytes: Vec<u8>) -> Self {
-       return Self{
-           length,
-           is_compressed,
-           offset,
-           bytes,
-       } 
+        return Self {
+            length,
+            is_compressed,
+            offset,
+            bytes,
+        };
     }
 
     pub fn from_string(name: String) -> Result<Self, &'static str> {
@@ -24,7 +23,7 @@ impl Label {
         if bytes.len() > 255 {
             return Err("Name exceeds max size for Label.");
         }
-        return Ok(Label{
+        return Ok(Label {
             length: bytes.len() as u8,
             is_compressed: false,
             offset: 0,
@@ -44,7 +43,7 @@ impl Label {
         let mut complet = false;
         let mut len: u8;
         while !complet {
-            if data_vec.len() == 0{
+            if data_vec.len() == 0 {
                 complet = true;
                 continue;
             }
@@ -54,13 +53,12 @@ impl Label {
                 continue;
             } else if len == 192 {
                 let offset = data_vec.next().unwrap();
-                labels.push(
-                    Label { 
-                        length: len,
-                        is_compressed: true,
-                        offset,
-                        bytes: vec![192, offset] 
-                    });
+                labels.push(Label {
+                    length: len,
+                    is_compressed: true,
+                    offset,
+                    bytes: vec![192, offset],
+                });
                 complet = true;
                 continue;
             } else {
@@ -70,12 +68,12 @@ impl Label {
                     b.push(data_vec.next().unwrap());
                     counter += 1;
                 }
-                labels.push(
-                    Label {
-                        length: len,
-                        is_compressed: false,
-                        offset: 0, bytes: b 
-                    });
+                labels.push(Label {
+                    length: len,
+                    is_compressed: false,
+                    offset: 0,
+                    bytes: b,
+                });
                 continue;
             }
         }
@@ -91,12 +89,13 @@ impl Label {
             return String::from("");
         } else {
             return String::from_iter(
-                self.bytes.to_vec()
-                .into_iter()
-                .map(|i| i as char)
-                .collect::<Vec<char>>()
-                .into_iter()
-                );
+                self.bytes
+                    .to_vec()
+                    .into_iter()
+                    .map(|i| i as char)
+                    .collect::<Vec<char>>()
+                    .into_iter(),
+            );
         }
     }
 
@@ -114,13 +113,12 @@ impl Label {
     }
 
     pub fn is_compressed(&self) -> bool {
-        return self.is_compressed
+        return self.is_compressed;
     }
 
     pub fn offset(&self) -> u8 {
         self.offset
     }
-
 }
 
 pub struct Name {
@@ -138,9 +136,8 @@ impl Clone for Name {
 }
 
 impl Name {
-
     pub fn new(labels: Vec<Label>, compressed: bool) -> Self {
-        return Self { labels, compressed }
+        return Self { labels, compressed };
     }
 
     pub fn from_string(name: String) -> Result<Self, &'static str> {
@@ -152,11 +149,10 @@ impl Name {
         for part in parts.into_iter() {
             labels.push(Label::from_string(part.to_string()).unwrap());
         }
-        return Ok(
-            Name {
-                labels,
-                compressed: false 
-            });
+        return Ok(Name {
+            labels,
+            compressed: false,
+        });
     }
 
     pub fn get_bytes_length(&self) -> u8 {
@@ -184,10 +180,7 @@ impl Name {
                 break;
             }
         }
-        return Name{
-            labels,
-            compressed,
-        };
+        return Name { labels, compressed };
     }
 
     pub fn get_string(&self) -> Result<String, &'static str> {
@@ -210,7 +203,6 @@ impl Name {
             res.push(0);
         }
         return res;
-
     }
 
     pub fn decompress(&self, data: Vec<u8>) -> Result<Self, &'static str> {
@@ -229,7 +221,10 @@ impl Name {
                 continue;
             }
         }
-        return Ok(Name { labels, compressed: false });
+        return Ok(Name {
+            labels,
+            compressed: false,
+        });
     }
 
     pub fn is_compressed(&self) -> bool {
@@ -244,25 +239,9 @@ mod tests {
 
     #[test]
     fn test_read_labels() {
-        let data: Vec<u8> = vec![
-            6,
-            103,
-            111,
-            111,
-            103,
-            108,
-            101,
-            3,
-            99,
-            111,
-            109,
-            0,
-        ];
+        let data: Vec<u8> = vec![6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0];
         let res = Label::read_labels(data).unwrap();
-        let expected_strings: Vec<String> = vec![
-            String::from("google"),
-            String::from("com"),
-        ];
+        let expected_strings: Vec<String> = vec![String::from("google"), String::from("com")];
         for (idx, v) in res.iter().enumerate() {
             assert_eq!(expected_strings[idx], v.get_string());
         }
@@ -270,30 +249,12 @@ mod tests {
 
     #[test]
     fn test_decompressing() {
-        let data: Vec<u8> = vec![
-            6,
-            103,
-            111,
-            111,
-            103,
-            108,
-            101,
-            3,
-            99,
-            111,
-            109,
-            0,
-        ];
-        let compressed: Vec<u8> = vec![
-            192,
-            7,
-        ];
+        let data: Vec<u8> = vec![6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0];
+        let compressed: Vec<u8> = vec![192, 7];
         let res = Label::read_labels(compressed).unwrap();
         assert_eq!(res[0].is_compressed, true);
         let decompressed = res[0].decompress(data).unwrap();
-        let expected_strings: Vec<String> = vec![
-            String::from("com"),
-        ];
+        let expected_strings: Vec<String> = vec![String::from("com")];
         for (idx, v) in decompressed.iter().enumerate() {
             assert_eq!(expected_strings[idx], v.get_string());
         }
@@ -301,28 +262,8 @@ mod tests {
 
     #[test]
     fn test_name_decompression() {
-        let data: Vec<u8> = vec![
-            6,
-            103,
-            111,
-            111,
-            103,
-            108,
-            101,
-            3,
-            99,
-            111,
-            109,
-            0,
-        ];
-        let compressed: Vec<u8> = vec![
-            3,
-            97,
-            112,
-            105,
-            192,
-            0,
-        ];
+        let data: Vec<u8> = vec![6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0];
+        let compressed: Vec<u8> = vec![3, 97, 112, 105, 192, 0];
         let expected_name: String = String::from("api.google.com");
         let compressed_name = Name::from_bytes(compressed, 0);
         let decompressed = compressed_name.decompress(data.to_vec()).unwrap();
@@ -332,24 +273,10 @@ mod tests {
 
     #[test]
     fn test_name_from_string() {
-        let data: Vec<u8> = vec![
-            6,
-            103,
-            111,
-            111,
-            103,
-            108,
-            101,
-            3,
-            99,
-            111,
-            109,
-            0,
-        ];
+        let data: Vec<u8> = vec![6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0];
         let name = Name::from_string(String::from("google.com")).unwrap();
         for (idx, v) in name.get_bytes().iter().enumerate() {
             assert_eq!(&data[idx], v);
         }
-
     }
 }

@@ -1,6 +1,6 @@
 use std::fmt;
 
-use utility::{Row, Byte};
+use utility::{Byte, Row};
 
 /*
  *                                1  1  1  1  1  1
@@ -92,18 +92,17 @@ pub enum OPCODE {
 }
 
 impl fmt::Display for OPCODE {
-   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             OPCODE::QUERY => write!(f, "OPCODE: Query"),
             OPCODE::IQUERY => write!(f, "OPCODE: Inverse Query"),
-            OPCODE::STATUS => write!(f,"OPCODE: Server Status"),
+            OPCODE::STATUS => write!(f, "OPCODE: Server Status"),
             OPCODE::UNKNOWN => write!(f, "OPCODE: Unknown"),
         }
-   } 
+    }
 }
 
 impl OPCODE {
-
     pub fn from_byte(byte: u8) -> Self {
         let mut code: i32 = 0;
         let mut pow: u32 = 0;
@@ -118,9 +117,8 @@ impl OPCODE {
             1 => OPCODE::IQUERY,
             2 => OPCODE::STATUS,
             _ => OPCODE::UNKNOWN,
-        }
+        };
     }
-
 }
 
 pub enum RCODE {
@@ -149,11 +147,11 @@ impl fmt::Display for RCODE {
                 "The Name Server was unable to process this query due to a problem with the name server."
             ),
             RCODE::NAMEERR => write!(
-                f, 
+                f,
                 "Meaningful only for responses from an authoritative name server, this code signifies that the domain name referenced in the query does not exist."
             ),
             RCODE::NOTIMPL => write!(
-                f, 
+                f,
                 "The name server does not support the requested kind of query."
             ),
             RCODE::REFUSED => write!(
@@ -165,12 +163,10 @@ impl fmt::Display for RCODE {
                 "An unknown error code was encountered. Check your parsing."
             )
         }
-        
     }
 }
 
 impl RCODE {
-    
     pub fn from_byte(byte: u8) -> RCODE {
         let n: u8 = byte.take_right_nibble();
         return match n {
@@ -194,7 +190,6 @@ impl RCODE {
             RCODE::REFUSED => true,
             RCODE::UNKNOWN => true,
         };
-
     }
 
     pub fn print(&self) {
@@ -203,32 +198,43 @@ impl RCODE {
 }
 
 pub struct Flags {
-    bytes: [u8;2],
+    bytes: [u8; 2],
 }
 
 impl fmt::Display for Flags {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let aa = if self.is_aa() {"Authoritative Answer: True"} else {"Authoritative Answer: False"};
-        let rd = if self.is_recursion_desired() {"Recursive: True"} else {"Recursive: False"};
-        let ra = if self.is_recursion_available() {"Recursion Available: True"} else {"Recursion Available: False"};
+        let aa = if self.is_aa() {
+            "Authoritative Answer: True"
+        } else {
+            "Authoritative Answer: False"
+        };
+        let rd = if self.is_recursion_desired() {
+            "Recursive: True"
+        } else {
+            "Recursive: False"
+        };
+        let ra = if self.is_recursion_available() {
+            "Recursion Available: True"
+        } else {
+            "Recursion Available: False"
+        };
         let op = self.get_opcode();
         let rcode = self.get_rcode();
-       write!(f, "{}\n{}\n{}\n{}\n{}", op, aa, rd, ra, rcode) 
+        write!(f, "{}\n{}\n{}\n{}\n{}", op, aa, rd, ra, rcode)
     }
 }
 
 impl Flags {
-    
     pub fn new() -> Self {
-        return Flags{bytes: [0,0]};
+        return Flags { bytes: [0, 0] };
     }
-    
-    pub fn data(&self) -> [u8;2] {
-        return  self.bytes;
+
+    pub fn data(&self) -> [u8; 2] {
+        return self.bytes;
     }
 
     pub fn from_bytes(bytes: Vec<u8>) -> Self {
-        return Flags{
+        return Flags {
             bytes: [bytes[0], bytes[1]],
         };
     }
@@ -250,7 +256,7 @@ impl Flags {
     }
 
     fn get_opcode(&self) -> OPCODE {
-        return OPCODE::from_byte(self.bytes[0])
+        return OPCODE::from_byte(self.bytes[0]);
     }
 
     pub fn is_aa(&self) -> bool {
@@ -279,10 +285,8 @@ mod test {
 
     use super::*;
 
-
     #[test]
     fn test_r_code_from_bytes() {
-
         assert!(matches!(RCODE::from_byte(0), RCODE::NOERR));
         assert!(matches!(RCODE::from_byte(1), RCODE::FMTERR));
         assert!(matches!(RCODE::from_byte(2), RCODE::SRVFAIL));
@@ -290,19 +294,16 @@ mod test {
         assert!(matches!(RCODE::from_byte(4), RCODE::NOTIMPL));
         assert!(matches!(RCODE::from_byte(5), RCODE::REFUSED));
         assert!(matches!(RCODE::from_byte(6), RCODE::UNKNOWN));
-
     }
 
     #[test]
     fn test_r_code_is_err() {
-
         assert_eq!(false, RCODE::NOERR.is_err());
         assert!(RCODE::FMTERR.is_err());
         assert!(RCODE::SRVFAIL.is_err());
         assert!(RCODE::NAMEERR.is_err());
-        assert!( RCODE::NOTIMPL.is_err());
-        assert!( RCODE::REFUSED.is_err());
+        assert!(RCODE::NOTIMPL.is_err());
+        assert!(RCODE::REFUSED.is_err());
         assert!(RCODE::UNKNOWN.is_err());
-
     }
 }

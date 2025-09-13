@@ -1,6 +1,9 @@
 use utility::Row;
 
-use crate::{name::Name, record::{RecordType, ARecord, AAAARecord, CNAMERecord, MXRecord, NSRecord}};
+use crate::{
+    name::Name,
+    record::{AAAARecord, ARecord, CNAMERecord, MXRecord, NSRecord, RecordType},
+};
 
 /*
                                1  1  1  1  1  1
@@ -22,7 +25,7 @@ use crate::{name::Name, record::{RecordType, ARecord, AAAARecord, CNAMERecord, M
     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--|
     /                     RDATA                     /
     /                                               /
-    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ 
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 
 */
 
@@ -30,9 +33,9 @@ use crate::{name::Name, record::{RecordType, ARecord, AAAARecord, CNAMERecord, M
 pub struct Answer {
     name: Name,
     r_type: RecordType,
-    class: [u8;2],
-    ttl: [u8;4],
-    length: [u8;2],
+    class: [u8; 2],
+    ttl: [u8; 4],
+    length: [u8; 2],
     a_data: Vec<u8>,
 }
 
@@ -50,18 +53,29 @@ impl Clone for Answer {
 }
 
 impl Answer {
-
-    pub fn new(name: Name, r_type: RecordType, class: [u8;2], ttl: [u8;4], length: [u8;2], a_data: Vec<u8>) -> Self {
-        return Self{
-            name, r_type, class, ttl, length, a_data,
-        }
+    pub fn new(
+        name: Name,
+        r_type: RecordType,
+        class: [u8; 2],
+        ttl: [u8; 4],
+        length: [u8; 2],
+        a_data: Vec<u8>,
+    ) -> Self {
+        return Self {
+            name,
+            r_type,
+            class,
+            ttl,
+            length,
+            a_data,
+        };
     }
 
     fn ttl_as_u32(&self) -> u32 {
-        ((self.ttl[0] as u32) << 24) +
-        ((self.ttl[1] as u32) << 16) +
-        ((self.ttl[2] as u32) << 8) +
-        ((self.ttl[3] as u32) << 0)
+        ((self.ttl[0] as u32) << 24)
+            + ((self.ttl[1] as u32) << 16)
+            + ((self.ttl[2] as u32) << 8)
+            + ((self.ttl[3] as u32) << 0)
     }
 
     fn print_record(&self, src: Vec<u8>) {
@@ -71,10 +85,10 @@ impl Answer {
             "CNAME" => CNAMERecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
             "MX" => MXRecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
             "NS" => NSRecord::from_bytes(self.a_data.to_vec(), src, 0).print(),
-            _ => println!("\tunparseable answer data.")
+            _ => println!("\tunparseable answer data."),
         };
     }
-    
+
     pub fn print(&self, src: Vec<u8>) {
         println!("---------------------");
         println!("\tName: {}", self.name.get_string().unwrap());
