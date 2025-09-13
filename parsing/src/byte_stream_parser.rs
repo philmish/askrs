@@ -15,9 +15,7 @@ pub struct ByteStream<'slice> {
 
 impl Clone for ByteStream<'_> {
     fn clone(&self) -> Self {
-        return ByteStream {
-            data: self.data.clone(),
-        };
+        return ByteStream { data: self.data };
     }
 }
 

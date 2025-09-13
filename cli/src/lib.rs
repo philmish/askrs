@@ -36,7 +36,7 @@ struct Flags {
 
 impl Flags {
     pub fn get_rtype(&self) -> RecordType {
-        return RecordType::from_string(self.record.clone());
+        RecordType::from_string(self.record.clone())
     }
 
     pub fn get_server(&self) -> DNSSocket {
