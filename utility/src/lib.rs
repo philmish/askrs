@@ -15,11 +15,10 @@ pub trait Byte {
 }
 
 impl Byte for u8 {
-
     fn bit_is_set(&self, pos: u8) -> bool {
         for n in 0..8 {
             if n == pos {
-                return 1 == self >> n & 1
+                return 1 == self >> n & 1;
             }
         }
         return false;
@@ -48,7 +47,7 @@ impl Byte for u8 {
     }
 
     fn set_bits(&mut self, map: u8) {
-       *self |= map;
+        *self |= map;
     }
 
     fn unset_bits(&mut self, map: u8) {
@@ -56,8 +55,7 @@ impl Byte for u8 {
     }
 }
 
-impl Row for [u8;2] {
-
+impl Row for [u8; 2] {
     fn as_u16(&self) -> u16 {
         return ((self[0] as u16) << 8) | self[1] as u16;
     }
@@ -80,29 +78,30 @@ impl Row for [u8;2] {
 }
 
 pub trait Blob {
-   fn get_slice(&self, start: u16, end: u16) -> Result<Vec<u8>, &'static str>;
-   fn get_from_offset(&self, start: u8) -> Result<Vec<u8>, &'static str>;
-   fn to_socket_msg(&self) -> Result<&[u8], &'static str>;
+    fn get_slice(&self, start: u16, end: u16) -> Result<Vec<u8>, &'static str>;
+    fn get_from_offset(&self, start: u8) -> Result<Vec<u8>, &'static str>;
+    fn to_socket_msg(&self) -> Result<&[u8], &'static str>;
 }
 
 impl Blob for Vec<u8> {
-
     fn get_slice(&self, start: u16, end: u16) -> Result<Self, &'static str> {
         if end < start || end as usize > self.len() {
             return Err("Invalid range");
-        } 
+        }
         let mut c = self.to_vec().into_iter();
         for _ in 0..start {
             c.next();
         }
         let mut count = 0;
         let mut res: Vec<u8> = vec![];
-        let _: Vec<()> = c.map(|i| {
-            if count < end {
-                res.push(i);
-            }
-            count += 1;
-        }).collect();
+        let _: Vec<()> = c
+            .map(|i| {
+                if count < end {
+                    res.push(i);
+                }
+                count += 1;
+            })
+            .collect();
         return Ok(res);
     }
 
@@ -113,12 +112,14 @@ impl Blob for Vec<u8> {
         let c = self.to_vec().into_iter();
         let mut count = 0;
         let mut res: Vec<u8> = vec![];
-        let _: Vec<()> = c.map(|i| {
-            if count >= start {
-                res.push(i);
-            }
-            count += 1;
-        }).collect();
+        let _: Vec<()> = c
+            .map(|i| {
+                if count >= start {
+                    res.push(i);
+                }
+                count += 1;
+            })
+            .collect();
         return Ok(res);
     }
 
@@ -135,29 +136,29 @@ mod tests {
 
     #[test]
     fn test_slicing() {
-        let a: Vec<u8> = vec![1,2,3,4,5];
-        let expect: Vec<u8> = vec![3,4,5];
+        let a: Vec<u8> = vec![1, 2, 3, 4, 5];
+        let expect: Vec<u8> = vec![3, 4, 5];
         let res: Vec<u8> = a.get_slice(2, 5).unwrap();
         for (idx, i) in res.iter().enumerate() {
             assert_eq!(&expect[idx], i);
-        } 
+        }
         assert_eq!(a.len(), 5);
     }
 
     #[test]
     fn test_get_from_offset() {
-        let a: Vec<u8> = vec![1,2,3,4,5];
-        let expect: Vec<u8> = vec![3,4,5];
+        let a: Vec<u8> = vec![1, 2, 3, 4, 5];
+        let expect: Vec<u8> = vec![3, 4, 5];
         let res: Vec<u8> = a.get_from_offset(2).unwrap();
         for (idx, i) in res.iter().enumerate() {
             assert_eq!(&expect[idx], i);
-        } 
+        }
         assert_eq!(a.len(), 5);
     }
 
     #[test]
     fn test_row_trait() {
-        let a: [u8;2] = [0,1];
+        let a: [u8; 2] = [0, 1];
         let expect_u16: u16 = 1;
         assert_eq!(a.as_u16(), expect_u16);
     }
