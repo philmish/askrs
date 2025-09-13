@@ -1,5 +1,5 @@
-use clap::Parser as clapParser;
 use clap::ArgAction;
+use clap::Parser as clapParser;
 use dns::record::RecordType;
 use parsing::byte_stream_parser::ByteStreamParser;
 use parsing::Query;
@@ -13,7 +13,6 @@ pub mod socket;
 #[clap(version = "0.1")]
 #[clap(about = "CLI tool for requesting dns records.", long_about = None)]
 struct Flags {
-
     /// Target adress or domain to request records for.
     #[clap(short, long)]
     uri: String,
@@ -36,13 +35,12 @@ struct Flags {
 }
 
 impl Flags {
-
     pub fn get_rtype(&self) -> RecordType {
-        return RecordType::from_string(self.record.clone())
+        return RecordType::from_string(self.record.clone());
     }
 
     pub fn get_server(&self) -> DNSSocket {
-        return DNSSocket::from_string(&self.server);
+        DNSSocket::from_string(&self.server)
     }
 }
 
@@ -51,36 +49,28 @@ pub struct CLI {
 }
 
 impl CLI {
-
     pub fn init() -> Self {
         let flags = Flags::parse();
-        return Self{
-            flags,
-        };
+        Self { flags }
     }
 
     fn send_query(&self, q: Query, srv: DNSSocket, verbose: bool) -> Vec<u8> {
-        let client = socket::UDPClient{};
+        let client = socket::UDPClient {};
         let msg = q.to_bytes();
-        let a = client.send_and_recieve(msg, srv)
-                      .unwrap();
+        let a = client.send_and_recieve(msg, srv).unwrap();
         if verbose {
             q.print(verbose);
         }
-        return a;
+        a
     }
 
     pub fn run(&self) {
         let qry = Query::new(
             self.flags.uri.clone(),
             self.flags.get_rtype(),
-            self.flags.rd.clone(),
+            self.flags.rd,
         );
-        let a = self.send_query(
-            qry,
-            self.flags.get_server(),
-            self.flags.verbose
-        );
+        let a = self.send_query(qry, self.flags.get_server(), self.flags.verbose);
         let resp = ByteStreamParser::new(&a).parse_response().unwrap();
         resp.print(self.flags.verbose);
     }
