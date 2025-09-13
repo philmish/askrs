@@ -15,22 +15,26 @@ pub struct ByteStream<'slice> {
 
 impl Clone for ByteStream<'_> {
     fn clone(&self) -> Self {
-        return ByteStream { data: self.data };
+        ByteStream { data: self.data }
     }
 }
 
 impl<'slice> ByteStream<'slice> {
     pub fn new(bytes: &'slice Vec<u8>) -> ByteStream<'slice> {
         let stream: &[u8] = bytes.as_slice();
-        return ByteStream { data: stream };
+        ByteStream { data: stream }
     }
 
     pub fn copy_bytes(&self) -> Vec<u8> {
-        return self.data.to_vec();
+        self.data.to_vec()
     }
 
     pub fn len(&self) -> usize {
-        return self.data.len();
+        self.data.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
     }
 
     pub fn get_iter(&self) -> std::slice::Iter<'slice, u8> {
@@ -46,12 +50,12 @@ pub struct ByteStreamParser<'slice> {
 
 impl<'slice> ByteStreamParser<'slice> {
     pub fn new(data: &'slice Vec<u8>) -> Self {
-        let stream = ByteStream::new(&data);
-        return Self {
+        let stream = ByteStream::new(data);
+        Self {
             data: stream.clone(),
             stream: stream.get_iter(),
             curr_offset: 0,
-        };
+        }
     }
 
     pub fn reset_stream(&mut self) {
@@ -74,7 +78,7 @@ impl<'slice> ByteStreamParser<'slice> {
             res.push(cursor);
             taken += 1;
         }
-        return Ok(res);
+        Ok(res)
     }
 
     pub fn set_stream_to_offset(&mut self, offset: u8) {
@@ -103,11 +107,11 @@ impl<'slice> ByteStreamParser<'slice> {
             curr_size += 1;
             self.curr_offset += 1;
         }
-        return Ok(res);
+        Ok(res)
     }
 
     pub fn remaining_stream_len(&self) -> usize {
-        return self.stream.len();
+        self.stream.len()
     }
 
     pub fn parse_dns_header(&mut self) -> Result<Header, String> {
@@ -154,11 +158,11 @@ impl<'slice> ByteStreamParser<'slice> {
                 continue;
             }
         }
-        if labels.len() == 0 {
+        if labels.is_empty() {
             return Err("Something went wrong parsing the labels.".to_string());
         }
         let name = Name::new(labels, compressed);
-        return Ok(name);
+        Ok(name)
     }
 
     pub fn take_row(&mut self) -> Result<[u8; 2], String> {
@@ -170,7 +174,7 @@ impl<'slice> ByteStreamParser<'slice> {
             buf[n] = *self.stream.next().unwrap();
             self.curr_offset += 1;
         }
-        return Ok(buf);
+        Ok(buf)
     }
 
     pub fn parse_question(&mut self) -> Result<Question, String> {
@@ -183,7 +187,7 @@ impl<'slice> ByteStreamParser<'slice> {
             Ok(qc) => QClass::from_row(qc),
             Err(err) => panic!("Failed to parse Question from byte stream: {}", err),
         };
-        return Ok(Question::init(name, qtype, qclass));
+        Ok(Question::init(name, qtype, qclass))
     }
 
     pub fn parse_answer(&mut self) -> Result<Answer, String> {
@@ -203,7 +207,7 @@ impl<'slice> ByteStreamParser<'slice> {
         }
         let length: [u8; 2] = self.take_row().unwrap();
         let a_data: Vec<u8> = self.pop_n_from_stream(length.as_u16() as usize).unwrap();
-        return Ok(Answer::new(name, r_type, class, ttl, length, a_data));
+        Ok(Answer::new(name, r_type, class, ttl, length, a_data))
     }
 
     pub fn parse_answers(&mut self, r_count: u8) -> Result<Vec<Answer>, String> {
@@ -213,12 +217,12 @@ impl<'slice> ByteStreamParser<'slice> {
             answer = self.parse_answer().unwrap();
             res.push(answer);
         }
-        if res.len() == 0 {
-            return Err(String::from(
+        if res.is_empty() {
+            Err(String::from(
                 "Something went wrong parsing the answer records. Could parse 0.",
-            ));
+            ))
         } else {
-            return Ok(res);
+            Ok(res)
         }
     }
 
@@ -241,12 +245,12 @@ impl<'slice> ByteStreamParser<'slice> {
         let mut answers: Vec<Answer> = vec![];
         answers.extend(records);
         answers.extend(ns_records);
-        return Ok(Response::new(
+        Ok(Response::new(
             self.data.copy_bytes(),
             header,
             question,
             answers,
-        ));
+        ))
     }
 }
 
