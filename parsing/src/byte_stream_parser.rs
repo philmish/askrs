@@ -1,9 +1,9 @@
 use dns::{
+    answer::Answer,
     header::Header,
     name::{Label, Name},
-    question::{Question, QClass},
+    question::{QClass, Question},
     record::RecordType,
-    answer::Answer
 };
 use utility::Row;
 
@@ -16,7 +16,7 @@ pub struct ByteStream<'slice> {
 impl Clone for ByteStream<'_> {
     fn clone(&self) -> Self {
         return ByteStream {
-           data: self.data.clone() ,
+            data: self.data.clone(),
         };
     }
 }
@@ -24,7 +24,7 @@ impl Clone for ByteStream<'_> {
 impl<'slice> ByteStream<'slice> {
     pub fn new(bytes: &'slice Vec<u8>) -> ByteStream<'slice> {
         let stream: &[u8] = bytes.as_slice();
-        return ByteStream{data: stream};
+        return ByteStream { data: stream };
     }
 
     pub fn copy_bytes(&self) -> Vec<u8> {
@@ -47,10 +47,9 @@ pub struct ByteStreamParser<'slice> {
 }
 
 impl<'slice> ByteStreamParser<'slice> {
-
     pub fn new(data: &'slice Vec<u8>) -> Self {
         let stream = ByteStream::new(&data);
-        return Self{
+        return Self {
             data: stream.clone(),
             stream: stream.get_iter(),
             curr_offset: 0,
@@ -61,7 +60,6 @@ impl<'slice> ByteStreamParser<'slice> {
         self.stream = self.data.get_iter();
         self.curr_offset = 0;
     }
-
 
     pub fn pop_n_from_stream(&mut self, n: usize) -> Result<Vec<u8>, String> {
         if self.remaining_stream_len() < n {
@@ -80,7 +78,7 @@ impl<'slice> ByteStreamParser<'slice> {
         }
         return Ok(res);
     }
-    
+
     pub fn set_stream_to_offset(&mut self, offset: u8) {
         if offset > self.curr_offset && offset as usize <= self.stream.len() {
             let n: u8 = offset - self.curr_offset;
@@ -94,7 +92,9 @@ impl<'slice> ByteStreamParser<'slice> {
 
     pub fn take_stream_slice(&mut self, size: u8) -> Result<Vec<u8>, String> {
         if size as usize > self.remaining_stream_len() {
-            return Err("Slice size is bigger than the remaining length of the stream.".to_string());
+            return Err(
+                "Slice size is bigger than the remaining length of the stream.".to_string(),
+            );
         }
         let mut curr_size: u8 = 0;
         let mut res: Vec<u8> = vec![];
@@ -110,15 +110,15 @@ impl<'slice> ByteStreamParser<'slice> {
 
     pub fn remaining_stream_len(&self) -> usize {
         return self.stream.len();
-    } 
+    }
 
     pub fn parse_dns_header(&mut self) -> Result<Header, String> {
         if self.curr_offset != 0 {
             self.reset_stream();
         }
         match self.pop_n_from_stream(12) {
-           Ok(b) => Ok(Header::from_bytes(b)),
-           Err(err) =>  Err(err),
+            Ok(b) => Ok(Header::from_bytes(b)),
+            Err(err) => Err(err),
         }
     }
 
@@ -128,7 +128,7 @@ impl<'slice> ByteStreamParser<'slice> {
         let mut compressed: bool = false;
         let mut len: u8;
         while !complet {
-            if self.remaining_stream_len() == 0{
+            if self.remaining_stream_len() == 0 {
                 complet = true;
                 continue;
             }
@@ -140,9 +140,7 @@ impl<'slice> ByteStreamParser<'slice> {
             } else if len == 192 {
                 let offset = self.stream.next().unwrap();
                 self.curr_offset += 1;
-                labels.push(
-                    Label::new(len, true, *offset, vec![192, *offset])
-                );
+                labels.push(Label::new(len, true, *offset, vec![192, *offset]));
                 compressed = true;
                 complet = true;
                 continue;
@@ -154,9 +152,7 @@ impl<'slice> ByteStreamParser<'slice> {
                     counter += 1;
                     self.curr_offset += 1;
                 }
-                labels.push(
-                    Label::new(len, false, 0, b)
-                );
+                labels.push(Label::new(len, false, 0, b));
                 continue;
             }
         }
@@ -167,11 +163,11 @@ impl<'slice> ByteStreamParser<'slice> {
         return Ok(name);
     }
 
-    pub fn take_row(&mut self) -> Result<[u8;2], String> {
+    pub fn take_row(&mut self) -> Result<[u8; 2], String> {
         if self.remaining_stream_len() == 0 {
             self.reset_stream();
         }
-        let mut buf: [u8;2] = [0, 0];
+        let mut buf: [u8; 2] = [0, 0];
         for n in 0..2 {
             buf[n] = *self.stream.next().unwrap();
             self.curr_offset += 1;
@@ -194,42 +190,35 @@ impl<'slice> ByteStreamParser<'slice> {
 
     pub fn parse_answer(&mut self) -> Result<Answer, String> {
         let mut name = match self.parse_name() {
-           Ok(n) => n,
-           Err(err) => panic!("Failed to parse Name in answer: {}", err),
+            Ok(n) => n,
+            Err(err) => panic!("Failed to parse Name in answer: {}", err),
         };
         if name.is_compressed() {
             name = name.decompress(self.data.copy_bytes()).unwrap();
         }
         let r_type = RecordType::from_bytes(self.take_row().unwrap());
         let class = self.take_row().unwrap();
-        let mut ttl: [u8;4] = [0, 0, 0, 0];
+        let mut ttl: [u8; 4] = [0, 0, 0, 0];
         for n in 0..4 {
             ttl[n] = *self.stream.next().unwrap();
             self.curr_offset += 1;
         }
-        let length: [u8;2] = self.take_row().unwrap();
+        let length: [u8; 2] = self.take_row().unwrap();
         let a_data: Vec<u8> = self.pop_n_from_stream(length.as_u16() as usize).unwrap();
-        return Ok(
-            Answer::new(
-                name,
-                r_type,
-                class,
-                ttl,
-                length,
-                a_data,
-            )
-        )
+        return Ok(Answer::new(name, r_type, class, ttl, length, a_data));
     }
 
     pub fn parse_answers(&mut self, r_count: u8) -> Result<Vec<Answer>, String> {
         let mut res: Vec<Answer> = vec![];
         let mut answer: Answer;
         for _n in 0..r_count {
-           answer = self.parse_answer().unwrap();
-           res.push(answer);
+            answer = self.parse_answer().unwrap();
+            res.push(answer);
         }
         if res.len() == 0 {
-            return Err(String::from("Something went wrong parsing the answer records. Could parse 0."));
+            return Err(String::from(
+                "Something went wrong parsing the answer records. Could parse 0.",
+            ));
         } else {
             return Ok(res);
         }
@@ -254,14 +243,12 @@ impl<'slice> ByteStreamParser<'slice> {
         let mut answers: Vec<Answer> = vec![];
         answers.extend(records);
         answers.extend(ns_records);
-        return Ok(
-            Response::new(
-                self.data.copy_bytes(),
-                header,
-                question,
-                answers
-            )
-        )
+        return Ok(Response::new(
+            self.data.copy_bytes(),
+            header,
+            question,
+            answers,
+        ));
     }
 }
 
@@ -275,31 +262,31 @@ mod tests {
 
     #[test]
     fn test_take_slice() {
-        let data: Vec<u8> = vec![1,2,3,4,5,6,7,8,9,10,11,12];
+        let data: Vec<u8> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
         let data_len = data.len();
         let mut parser = ByteStreamParser::new(&data);
         assert_eq!(parser.remaining_stream_len(), data_len);
 
         let sl = parser.take_stream_slice(3).unwrap();
-        assert_eq!(sl, vec![1,2,3]);
+        assert_eq!(sl, vec![1, 2, 3]);
         assert_eq!(parser.remaining_stream_len(), data_len - 3);
     }
 
     #[test]
     fn test_pop_n() {
-        let data: Vec<u8> = vec![1,2,3,4,5,6,7,8,9,10,11,12];
+        let data: Vec<u8> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
         let mut parser = ByteStreamParser::new(&data);
         let mut taken = parser.pop_n_from_stream(3).unwrap();
-        assert_eq!(taken, vec![1,2,3]);
+        assert_eq!(taken, vec![1, 2, 3]);
         assert_eq!(parser.remaining_stream_len(), 9);
         taken = parser.pop_n_from_stream(3).unwrap();
-        assert_eq!(taken, vec![4,5,6]);
+        assert_eq!(taken, vec![4, 5, 6]);
         assert_eq!(parser.remaining_stream_len(), 6);
     }
 
     #[test]
     fn test_set_stream_to_offset() {
-        let data: Vec<u8> = vec![1,2,3,4,5,6,7,8,9,10,11,12];
+        let data: Vec<u8> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
         let mut parser = ByteStreamParser::new(&data);
         parser.set_stream_to_offset(3);
         assert_eq!(9, parser.remaining_stream_len());
@@ -307,7 +294,7 @@ mod tests {
 
     #[test]
     fn test_reset_stream() {
-        let data: Vec<u8> = vec![1,2,3,4,5,6,7,8,9,10,11,12];
+        let data: Vec<u8> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
         let mut parser = ByteStreamParser::new(&data);
         parser.set_stream_to_offset(3);
         assert_eq!(9, parser.remaining_stream_len());
@@ -318,9 +305,7 @@ mod tests {
     #[test]
     fn test_parse_header() {
         let data: Vec<u8> = vec![
-            0xDE, 0xAD, 0x01, 0x00,
-            0x00, 0x01, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00,
+            0xDE, 0xAD, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ];
         let mut parser = ByteStreamParser::new(&data);
         let header: Header = parser.parse_dns_header().unwrap();
@@ -331,9 +316,7 @@ mod tests {
     #[test]
     fn test_parse_name() {
         let data: Vec<u8> = vec![
-            0x06, 0x67, 0x6F, 0x6F,
-            0x67, 0x6C, 0x65, 0x03,
-            0x63, 0x6F, 0x6D, 0x00,
+            0x06, 0x67, 0x6F, 0x6F, 0x67, 0x6C, 0x65, 0x03, 0x63, 0x6F, 0x6D, 0x00,
         ];
         let mut parser = ByteStreamParser::new(&data);
         let name = parser.parse_name().unwrap();
@@ -346,13 +329,8 @@ mod tests {
     #[test]
     fn test_parse_answer() {
         let data: Vec<u8> = vec![
-            6, 103, 111, 111,
-            103, 108, 101, 3,
-            99, 111, 109, 0,
-            0, 1, 0, 1,
-            0, 0, 0, 1,
-            0, 4, 1, 1,
-            1, 1,
+            6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 4, 1,
+            1, 1, 1,
         ];
         let mut parser = ByteStreamParser::new(&data);
         assert!(match parser.parse_answer() {
@@ -364,27 +342,10 @@ mod tests {
     #[test]
     fn test_parse_answers() {
         let data: Vec<u8> = vec![
-            6, 103, 111, 111,
-            103, 108, 101, 3,
-            99, 111, 109, 0,
-            0, 1, 0, 1,
-            0, 0, 0, 1,
-            0, 4, 1, 1,
-            1, 1,
-            6, 103, 111, 111,
-            103, 108, 101, 3,
-            99, 111, 109, 0,
-            0, 1, 0, 1,
-            0, 0, 0, 1,
-            0, 4, 1, 1,
-            1, 1,
-            6, 103, 111, 111,
-            103, 108, 101, 3,
-            99, 111, 109, 0,
-            0, 1, 0, 1,
-            0, 0, 0, 1,
-            0, 4, 1, 1,
-            1, 1,
+            6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 4, 1,
+            1, 1, 1, 6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0, 0, 1, 0, 1, 0, 0, 0, 1,
+            0, 4, 1, 1, 1, 1, 6, 103, 111, 111, 103, 108, 101, 3, 99, 111, 109, 0, 0, 1, 0, 1, 0,
+            0, 0, 1, 0, 4, 1, 1, 1, 1,
         ];
 
         let mut parser = ByteStreamParser::new(&data);
@@ -397,21 +358,12 @@ mod tests {
     #[test]
     fn test_parse_respone() {
         let data: Vec<u8> = vec![
-            0xDE, 0xAD, 0x01, 0x00,
-            0x00, 0x01, 0x00, 0x01,
-            0x00, 0x00, 0x00, 0x00,
-            0x06, 0x67, 0x6F, 0x6F,
-            0x67, 0x6C, 0x65, 0x03,
-            0x63, 0x6F, 0x6D, 0x00,
-            0x00, 0x01, 0x00, 0x01,
-            192, 12,0, 1, 
-            0, 1, 0, 0, 
-            0, 1,0, 4, 
-            1, 1, 1, 1,
+            0xDE, 0xAD, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x06, 0x67,
+            0x6F, 0x6F, 0x67, 0x6C, 0x65, 0x03, 0x63, 0x6F, 0x6D, 0x00, 0x00, 0x01, 0x00, 0x01,
+            192, 12, 0, 1, 0, 1, 0, 0, 0, 1, 0, 4, 1, 1, 1, 1,
         ];
         let mut parser = ByteStreamParser::new(&data);
         let response: Response = parser.parse_response().unwrap();
         response.print(true);
     }
 }
-
