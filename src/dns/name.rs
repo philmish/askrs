@@ -1,7 +1,30 @@
 use byters::{BigEndian, ReadsFromBytes, ReadsIntoBytes};
 
+use crate::dns::error::DnsError;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Name<'a>(&'a str);
+
+#[derive(Debug)]
+pub enum Label {
+    Fragment(Vec<u8>),
+    End,
+}
+
+impl<'a> TryFrom<&'a str> for Name<'a> {
+    type Error = NameError;
+
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+        let l = value.len();
+        if l > 255 {
+            return Err(NameError::NameToLong(l));
+        }
+        if l == 0 {
+            return Err(NameError::EmptyName);
+        }
+        Ok(Self(value))
+    }
+}
 
 impl<'a> TryInto<Vec<Label>> for Name<'a> {
     type Error = NameError;
@@ -18,17 +41,6 @@ impl<'a> TryInto<Vec<Label>> for Name<'a> {
         out.push(Label::End);
         Ok(out)
     }
-}
-
-#[derive(Debug)]
-pub enum NameError {
-    NameToLong(usize),
-    LabelToLong(usize),
-}
-
-pub enum Label {
-    Fragment(Vec<u8>),
-    End,
 }
 
 impl Label {
@@ -59,7 +71,14 @@ impl TryFrom<&str> for Label {
         }
         let mut v: Vec<u8> = Vec::with_capacity(l + 1);
         v.push(l as u8);
-        value.chars().map(|c| v.push(c as u8));
+        v.extend_from_slice(value.as_bytes());
         Ok(Label::Fragment(v))
     }
+}
+
+#[derive(Debug)]
+pub enum NameError {
+    EmptyName,
+    NameToLong(usize),
+    LabelToLong(usize),
 }
