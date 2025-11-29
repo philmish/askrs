@@ -11,32 +11,6 @@ pub enum RecordData<'a> {
     TXT(&'a str),
 }
 
-// impl TryFrom<&str> for RecordDataType {
-//     type Error = RecordError;
-//     fn try_from(value: &str) -> Result<Self, Self::Error> {
-//         match value {
-//             "A" => Ok(RecordDataType::A),
-//             "AAAA" => Ok(RecordDataType::AAAA),
-//             "CNAME" => Ok(RecordDataType::CNAME),
-//             "MX" => Ok(RecordDataType::MX),
-//             "NS" => Ok(RecordDataType::NS),
-//             _ => Err(RecordError::InvalidRecordDataType),
-//         }
-//     }
-// }
-
-// impl RecordData<'_> {
-//     pub fn r#type(&self) -> RecordDataType {
-//         match self {
-//             RecordData::A(_) => RecordDataType::A,
-//             RecordData::AAAA(_) => RecordDataType::AAAA,
-//             RecordData::CNAME(_) => RecordDataType::CNAME,
-//             RecordData::MX { .. } => RecordDataType::MX,
-//             RecordData::NS(_) => RecordDataType::NS,
-//         }
-//     }
-// }
-
 impl From<Ipv4Addr> for RecordData<'_> {
     fn from(value: Ipv4Addr) -> Self {
         Self::A(value)
