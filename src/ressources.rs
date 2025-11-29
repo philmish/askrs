@@ -1,6 +1,5 @@
 use std::net::SocketAddr;
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, Debug)]
 pub enum DnsServer {
     GOOGLE,
