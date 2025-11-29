@@ -1,3 +1,6 @@
+use byters::{BigEndian, ReadsFromBytes, ReadsIntoBytes};
+
+#[derive(Debug, Clone, Copy)]
 pub struct Name<'a>(&'a str);
 
 impl<'a> TryInto<Vec<Label>> for Name<'a> {
@@ -12,18 +15,18 @@ impl<'a> TryInto<Vec<Label>> for Name<'a> {
             let l = Label::try_from(fragment)?;
             out.push(l);
         }
-        out.push(Label::Delimiter);
+        out.push(Label::End);
         Ok(out)
     }
 }
 
+#[derive(Debug)]
 pub enum NameError {
     NameToLong(usize),
     LabelToLong(usize),
 }
 
 pub enum Label {
-    Delimiter,
     Fragment(Vec<u8>),
     End,
 }
@@ -31,14 +34,12 @@ pub enum Label {
 impl Label {
     pub fn byte_len(&self) -> usize {
         match self {
-            Self::Delimiter => 2,
             Self::Fragment(v) => v[0] as usize,
             Self::End => 1,
         }
     }
     pub fn as_bytes(&self) -> &[u8] {
         match self {
-            Self::Delimiter => &[0, 0],
             Self::Fragment(v) => v.as_slice(),
             Self::End => &[0],
         }
@@ -58,9 +59,7 @@ impl TryFrom<&str> for Label {
         }
         let mut v: Vec<u8> = Vec::with_capacity(l + 1);
         v.push(l as u8);
-        for c in value.chars() {
-            v.push(c as u8);
-        }
+        value.chars().map(|c| v.push(c as u8));
         Ok(Label::Fragment(v))
     }
 }

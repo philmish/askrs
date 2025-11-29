@@ -11,6 +11,6 @@ dependencies = [
 
 [[package]]
 name = "byters"
-version = "0.1.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5b5c29819e6257bdbfe1037776d3a288f1b878cef43b2ffd9f948f705732f6d"
+checksum = "1ffcff91f25c764984f33cf547699c64774e714143ea6d19164b0962040b9ada"
