@@ -32,6 +32,16 @@ impl MessageHeader {
     pub fn empty() -> Self {
         return Self([0u8; 12]);
     }
+
+    pub fn copy_into(&self, buf: &mut [u8]) {
+        buf.copy_from_slice(self.0.as_slice());
+    }
+}
+
+impl Into<Vec<u8>> for MessageHeader {
+    fn into(self) -> Vec<u8> {
+        self.0.to_vec()
+    }
 }
 
 impl From<[u8; 12]> for MessageHeader {
@@ -156,7 +166,7 @@ impl HeaderReadWriter {
     }
 
     pub fn write_recursion_desired(&self, data: &mut MessageHeader) {
-        data.0[2].set_bit(self.bits.rec_offset);
+        data.0[2].set_bit(self.bits.recd_offset);
     }
 
     pub fn recursion_is_available(&self, data: &MessageHeader) -> bool {
